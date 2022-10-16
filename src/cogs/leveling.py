@@ -14,6 +14,9 @@ class Leveling(discord.Cog):
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if message.guild is None:
+            return
+
         if message.author.id in self.cache or message.author.bot:
             return
 
