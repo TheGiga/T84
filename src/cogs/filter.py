@@ -8,6 +8,9 @@ class Filter(discord.Cog):
 
     @discord.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        if payload.guild_id is None:
+            return
+
         if not payload.emoji.is_unicode_emoji():
             return
 

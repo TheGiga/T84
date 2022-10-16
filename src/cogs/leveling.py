@@ -11,6 +11,7 @@ class Leveling(discord.Cog):
     def __init__(self, bot: discord.Bot):
         self.bot = bot
         self.cache = []
+        self.caching_loop.start()
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
