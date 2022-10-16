@@ -43,7 +43,7 @@ class User(Model):
         :return: (level: int, affected: bool)
         """
 
-        level_raw = 0.5 * sqrt(self.xp)
+        level_raw = 0.3 * sqrt(self.xp)
         level = floor(level_raw)
 
         affected = False
