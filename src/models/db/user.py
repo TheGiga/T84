@@ -23,7 +23,42 @@ class User(Model):
     def __repr__(self):
         return f'User({self.discord_id=}, {self.id=})'
 
+    @staticmethod
+    def level_to_xp(level: int) -> int:
+        xp = level // config.XP_MULTIPLIER
+        xp = xp ** 2
+
+        return floor(xp)
+
+    @staticmethod
+    def xp_to_level(xp: int) -> int:
+        lvl_raw = config.XP_MULTIPLIER * sqrt(xp)
+
+        return floor(lvl_raw)
+
+    @property
+    def xp_tnl(self) -> int:
+        """
+        :return: INT: Amount of XP needed to reach next level.
+        """
+        xp_nl = self.level_to_xp(self.level + 1)
+        xp_tnl = xp_nl - self.xp
+
+        return xp_tnl
+
+    @property
+    def xp_tnl_percent(self) -> int:
+        """
+        :return: INT: Amount of XP needed to reach next level in %.
+        """
+
+        xp_nl = self.level_to_xp(self.level + 1)
+        xp_tnl = xp_nl - self.xp
+
+        return round((xp_tnl / xp_nl) * 100)
+
     async def get_discord_instance(self, guild: discord.Guild = None) -> discord.User | discord.Member | None:
+
         if guild is None:
             user = await bot_instance.get_or_fetch_user(self.discord_id)
 
@@ -34,17 +69,18 @@ class User(Model):
 
             return user
 
-    async def update_levels(self) -> (int, bool):
+    async def update_levels(self, guild: discord.Guild = None) -> (int, bool):
         """
         Update user levels based on XP.
+
         level - current level of user
+
         affected - if level was changed - this parameter will be True
         
         :return: (level: int, affected: bool)
         """
 
-        level_raw = 0.3 * sqrt(self.xp)
-        level = floor(level_raw)
+        level = self.xp_to_level(self.xp)
 
         affected = False
 
@@ -52,15 +88,17 @@ class User(Model):
             self.level = level
             await self.save()
 
-            for key in config.awards:
-                if key <= level:
-                    role = config.awards[key]
+            if guild is not None:
+                for key in config.awards:
+                    if key <= level:
+                        role = config.awards[key]
 
-                    guild = bot_instance.get_guild(config.PARENT_GUILD)
-                    role = guild.get_role(role)
-                    member = await self.get_discord_instance(guild=guild)
-                    if role not in member.roles:
-                        await member.add_roles(role)
+                        guild = bot_instance.get_guild(config.PARENT_GUILD)
+                        role = guild.get_role(role)
+                        member = await self.get_discord_instance(guild=guild)
+
+                        if role not in member.roles:
+                            await member.add_roles(role)
 
             affected = True
 

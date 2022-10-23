@@ -27,13 +27,14 @@ class Leveling(discord.Cog):
         xp = random.randint(4, 6)
 
         user.xp += xp
-        await user.save()
+        await user.save(update_fields=["xp"])
 
-        lvl, affected = await user.update_levels()
+        lvl, affected = await user.update_levels(guild=message.guild)
 
         if affected:
             embed = DefaultEmbed()
-            embed.description = f"**Ви досягли нового рівню!**"
+            embed.description = f"**Ви досягли нового рівню!**\n\nПропишіть </profile:1031212782437290054> щоб " \
+                                f"подивится повну статистику. "
             embed.add_field(name='⚖ Рівень', value=f"`{lvl}`")
             embed.add_field(name='🎈 Досвід', value=f'`{user.xp}`')
 
