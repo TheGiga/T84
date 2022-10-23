@@ -24,7 +24,7 @@ class Leveling(discord.Cog):
         await Guild.get_or_create(discord_id=message.guild.id)
         user, _ = await User.get_or_create(discord_id=message.author.id)
 
-        xp = random.randint(4, 6)
+        xp = random.randint(10, 20)
 
         user.xp += xp
         await user.save(update_fields=["xp"])
