@@ -24,7 +24,7 @@ class Leveling(discord.Cog):
         await Guild.get_or_create(discord_id=message.guild.id)
         user, _ = await User.get_or_create(discord_id=message.author.id)
 
-        xp = random.randint(10, 20)
+        xp = random.randint(13, 18)
 
         user.xp += xp
         await user.save(update_fields=["xp"])
@@ -32,9 +32,12 @@ class Leveling(discord.Cog):
         lvl, affected = await user.update_levels(guild=message.guild)
 
         if affected:
+            from .profile import progress_bar
+
             embed = DefaultEmbed()
             embed.description = f"**Ви досягли нового рівню!**\n\nПропишіть </profile:1031212782437290054> щоб " \
-                                f"подивится повну статистику. "
+                                f"подивится повну статистику свого профілю. \n\n" \
+                                f"Прогрес до слідуючого рівню: \n> ```{progress_bar(user.xp_tnl_percent)}```"
             embed.add_field(name='⚖ Рівень', value=f"`{lvl}`")
             embed.add_field(name='🎈 Досвід', value=f'`{user.xp}`')
 
@@ -42,7 +45,7 @@ class Leveling(discord.Cog):
                 await message.reply(
                     embed=embed,
                     content=f"{message.author.mention}",
-                    delete_after=10.0
+                    delete_after=20.0
                 )
             except discord.Forbidden:
                 pass

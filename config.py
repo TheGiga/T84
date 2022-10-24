@@ -1,4 +1,6 @@
 PARENT_GUILD: int = 997857861705146368
+TESTING_GUILD: int = 804835509968568351
+PG_INVITE: str = "https://discord.gg/8GHx6ak8cs"
 
 cogs: list = [
     "src.cogs.filter",
