@@ -6,9 +6,12 @@ load_dotenv()
 
 import sentry_sdk
 
+sentry_debug = True if os.getenv("SENTRY_DEBUG") == "True" else False
+sentry_adress = f"http://{os.getenv('SENTRY_PK')}@38.242.131.170:9000/2"
+
 sentry_sdk.init(
-    dsn=f"http://{os.getenv('SENTRY_PK')}@38.242.131.170:9000/2",
-    debug=bool(os.getenv("SENTRY_DEBUG")),
+    dsn=sentry_adress,
+    debug=sentry_debug,
     traces_sample_rate=1.0,
 )
 

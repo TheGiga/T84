@@ -13,7 +13,11 @@ py-cord==2.2.2
 pydantic==1.10.2
 pypika-tortoise==0.1.6
 python-dotenv==0.21.0
-pytz==2022.4
+pytz==2022.5
 tortoise-orm==0.19.2
 typing_extensions==4.4.0
 yarl==1.8.1
+certifi==2022.9.24
+sentry-sdk==1.10.1
+urllib3==1.26.12
+
