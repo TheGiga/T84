@@ -1,7 +1,7 @@
 import random
 import discord
 from typing import Any
-from discord import SlashCommandGroup, guild_only
+from discord import guild_only
 from discord.ext import tasks
 from tortoise.queryset import QuerySet
 
@@ -16,7 +16,7 @@ class Leveling(discord.Cog):
         self.caching_loop.start()
 
     @guild_only()
-    @discord.slash_command(name='top', description='Список лідерів по XP.')
+    @discord.slash_command(name='top', description='🎈 Список лідерів по рівню.')
     async def top(self, ctx: discord.ApplicationContext):
         query_set: list[User, Any] = await QuerySet(User).order_by('xp')
         query_set.reverse()
@@ -25,12 +25,12 @@ class Leveling(discord.Cog):
         i = 1
 
         for user in query_set:
-            if i > 10:
-                break
-
             discord_user = await user.get_discord_instance(guild=ctx.guild)
             leaderboard += f"{i}. {discord_user.mention}: `{user.xp} XP` `Lvl. {user.level}`\n"
             i += 1
+
+            if i == 10:
+                break
 
         embed = DefaultEmbed()
         embed.title = "🎈 Топ 10 учасників за рівнем"
@@ -72,7 +72,7 @@ class Leveling(discord.Cog):
                     content=f"{message.author.mention}",
                     delete_after=20.0
                 )
-            except discord.Forbidden:
+            except discord.HTTPException:
                 pass
 
         self.cache.append(user.discord_id)

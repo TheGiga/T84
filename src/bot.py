@@ -5,7 +5,6 @@ import config
 from art import tprint
 from .errors import GuildNotWhitelisted
 
-
 _intents = discord.Intents.default()
 _intents.__setattr__("messages", True)
 _intents.__setattr__("message_content", True)
@@ -13,16 +12,70 @@ _intents.__setattr__("message_content", True)
 bot_instance = discord.Bot(intents=_intents)
 
 
+def help_command_embed() -> discord.Embed:
+    embed = discord.Embed(colour=discord.Colour.embed_background(), timestamp=discord.utils.utcnow())
+    embed.title = 'Допомога'
+    embed.set_footer(text='by gigalegit-#0880')
+
+    slash_commands, slash_commands_count = '', 0
+
+    for command in bot_instance.commands:
+        match command.__class__:
+            case discord.SlashCommandGroup:
+                sub_commands = ''
+                for sub_command in command.subcommands:
+                    sub_commands += f'> `{sub_command.name}` - {sub_command.description}\n'
+                embed.add_field(name=f'/{command.qualified_name}', value=sub_commands)
+            case discord.SlashCommand:
+                slash_commands += f'{command.mention} - {command.description}\n'
+                slash_commands_count += 1
+            case _:
+                continue
+
+    embed.description = f"""
+        **Слеш-команди**: `({slash_commands_count})`
+        {slash_commands}
+    """
+
+    return embed
+
+
 @bot_instance.event
-async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+async def on_application_command_error(
+        ctx: discord.ApplicationContext, error: discord.ApplicationCommandError
+):
     if isinstance(error, GuildNotWhitelisted):
         return
-
-    if isinstance(error, MissingPermissions):
+    elif isinstance(error, MissingPermissions):
         embed = discord.Embed(colour=discord.Colour.red(), title='⚠ Заборонено!')
         embed.description = f"❌ Вам не дозволено виконання цієї команди!"
-        await ctx.respond()
+        await ctx.respond(embed=embed)
         return
+
+    if isinstance(error, discord.ApplicationCommandInvokeError):
+        await ctx.respond(
+            "Сталася невідома помилка, якщо це повторюється - напишіть розробнику бота: `gigalegit-#0880` "
+            "Також, приєднуйтесь до сервера бота.",
+            view=discord.ui.View(
+                discord.ui.Button(
+                    label="Сервер Бота", url=config.PG_INVITE
+                ),
+                discord.ui.Button(
+                    label="GitHub Репозиторій",
+                    url="https://github.com/TheGiga/T84",
+                ),
+            ),
+        )
+
+    await ctx.respond(
+        embed=discord.Embed(
+            title=error.__class__.__name__,
+            description=str(error),
+            color=discord.Colour.embed_background(),
+        )
+    )
+
+    raise error
 
 
 # Global command check

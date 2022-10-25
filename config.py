@@ -5,7 +5,8 @@ PG_INVITE: str = "https://discord.gg/8GHx6ak8cs"
 cogs: list = [
     "src.cogs.filter",
     "src.cogs.profile",
-    "src.cogs.leveling"
+    "src.cogs.leveling",
+    "src.cogs.help"
 ]
 
 # Filter
