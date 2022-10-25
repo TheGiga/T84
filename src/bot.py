@@ -4,6 +4,7 @@ from discord.ext.commands import MissingPermissions
 import config
 from art import tprint
 from .errors import GuildNotWhitelisted
+from sentry_sdk import capture_exception
 
 _intents = discord.Intents.default()
 _intents.__setattr__("messages", True)
@@ -54,8 +55,9 @@ async def on_application_command_error(
 
     if isinstance(error, discord.ApplicationCommandInvokeError):
         await ctx.respond(
-            "Сталася невідома помилка, якщо це повторюється - напишіть розробнику бота: `gigalegit-#0880` "
-            "Також, приєднуйтесь до сервера бота.",
+            "Сталася невідома помилка, я доповів про цей кейс розробнику.\n\n"
+            "Якщо це буде повторюватись - напишіть розробнику: `gigalegit-#0880`"
+            "Якщо вам щось терміново потрібно - приєднуйтесь до серверу бота. *(кнопка нижче)*",
             view=discord.ui.View(
                 discord.ui.Button(
                     label="Сервер Бота", url=config.PG_INVITE
@@ -75,6 +77,7 @@ async def on_application_command_error(
         )
     )
 
+    capture_exception(error)
     raise error
 
 
