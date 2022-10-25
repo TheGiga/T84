@@ -31,7 +31,7 @@ class Profile(discord.Cog):
         if member is None:
             member = ctx.author
 
-        user = await User.get(discord_id=member.id)
+        user, _ = await User.get_or_create(discord_id=member.id)
 
         await user.get_discord_instance(guild=ctx.guild)
 
