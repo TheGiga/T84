@@ -1,7 +1,9 @@
 import random
-
 import discord
+from typing import Any
+from discord import SlashCommandGroup, guild_only
 from discord.ext import tasks
+from tortoise.queryset import QuerySet
 
 from src.models import Guild, User
 from src import DefaultEmbed
@@ -12,6 +14,29 @@ class Leveling(discord.Cog):
         self.bot = bot
         self.cache = []
         self.caching_loop.start()
+
+    @guild_only()
+    @discord.slash_command(name='top', description='Список лідерів по XP.')
+    async def top(self, ctx: discord.ApplicationContext):
+        query_set: list[User, Any] = await QuerySet(User).order_by('xp')
+        query_set.reverse()
+
+        leaderboard = ""
+        i = 1
+
+        for user in query_set:
+            if i > 10:
+                break
+
+            discord_user = await user.get_discord_instance(guild=ctx.guild)
+            leaderboard += f"{i}. {discord_user.mention}: `{user.xp} XP` `Lvl. {user.level}`\n"
+            i += 1
+
+        embed = DefaultEmbed()
+        embed.title = "🎈 Топ 10 учасників за рівнем"
+        embed.description = leaderboard
+
+        await ctx.respond(embed=embed)
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -24,7 +49,7 @@ class Leveling(discord.Cog):
         await Guild.get_or_create(discord_id=message.guild.id)
         user, _ = await User.get_or_create(discord_id=message.author.id)
 
-        xp = random.randint(13, 18)
+        xp = random.randint(9, 13)
 
         user.xp += xp
         await user.save(update_fields=["xp"])
