@@ -26,7 +26,8 @@ class Leveling(discord.Cog):
 
         for user in query_set:
             discord_user = await user.get_discord_instance(guild=ctx.guild)
-            leaderboard += f"{i}. {discord_user.mention}: `{user.xp} XP` `Lvl. {user.level}`\n"
+            leaderboard += f"{i}. {discord_user.mention if discord_user is not None else user.discord_id}: " \
+                           f"`{user.xp} XP` `Lvl. {user.level}`\n"
             i += 1
 
             if i == 10:

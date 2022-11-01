@@ -1,6 +1,7 @@
 from math import sqrt, floor
 
 import discord
+from discord import NotFound
 from tortoise import fields
 from tortoise.models import Model
 
@@ -58,16 +59,18 @@ class User(Model):
         return round((xp_tnl / xp_nl) * 100)
 
     async def get_discord_instance(self, guild: discord.Guild = None) -> discord.User | discord.Member | None:
+        try:
+            if guild is None:
+                user = await bot_instance.get_or_fetch_user(self.discord_id)
 
-        if guild is None:
-            user = await bot_instance.get_or_fetch_user(self.discord_id)
+                return user
+            else:
+                # user = await guild.get_or_fetch_member(self.discord_id)
+                user = await discord.utils.get_or_fetch(guild, 'member', self.discord_id, )
 
-            return user
-        else:
-            # user = await guild.get_or_fetch_member(self.discord_id)
-            user = await discord.utils.get_or_fetch(guild, 'member', self.discord_id, )
-
-            return user
+                return user
+        except NotFound:
+            return None
 
     async def update_levels(self, guild: discord.Guild = None) -> (int, bool):
         """

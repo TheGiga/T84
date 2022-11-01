@@ -9,6 +9,7 @@ from sentry_sdk import capture_exception
 _intents = discord.Intents.default()
 _intents.__setattr__("messages", True)
 _intents.__setattr__("message_content", True)
+_intents.__setattr__("members", True)
 
 bot_instance = discord.Bot(intents=_intents)
 
