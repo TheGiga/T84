@@ -43,9 +43,16 @@ class Profile(discord.Cog):
         embed.add_field(name='🔢 UID', value=f'`#{user.id}`')
         embed.set_thumbnail(url=member.display_avatar.url)
 
+        xp_new_level_full = user.level_to_xp(user.level + 1)
+        xp_current_level = user.level_to_xp(user.level)
+        xp_to_new_level = user.xp - xp_current_level
+        xp_new_level = xp_new_level_full - xp_current_level
+
+        percent = round((xp_to_new_level / xp_new_level) * 100)
+
         embed.description = f"""
-        Прогрес до слідуючого рівню: `{user.xp}/{user.level_to_xp(user.level+1)}`
-        > ```{progress_bar(user.xp_tnl_percent)}```
+        Прогрес до наступного рівню: `{user.xp}/{user.level_to_xp(user.level+1)}`
+        > ```{user.level} {progress_bar(percent)} {user.level+1}```
         """
 
         await ctx.respond(embed=embed)

@@ -55,15 +55,19 @@ class Leveling(discord.Cog):
         user.xp += xp
         await user.save(update_fields=["xp"])
 
-        lvl, affected = await user.update_levels(guild=message.guild)
+        lvl, affected, rewards = await user.update_levels(guild=message.guild)
 
         if affected:
-            from .profile import progress_bar
+
+            desc = f"**Ви досягли нового рівню!**\n\nПропишіть </profile:1031212782437290054> щоб " \
+                f"подивится повну статистику свого профілю."
+
+            if rewards is not None:
+                desc += f"\n\n**Нагороди**: {rewards}"
 
             embed = DefaultEmbed()
-            embed.description = f"**Ви досягли нового рівню!**\n\nПропишіть </profile:1031212782437290054> щоб " \
-                                f"подивится повну статистику свого профілю. \n\n" \
-                                f"Прогрес до слідуючого рівню: \n> ```{progress_bar(user.xp_tnl_percent)}```"
+            embed.description = desc
+
             embed.add_field(name='⚖ Рівень', value=f"`{lvl}`")
             embed.add_field(name='🎈 Досвід', value=f'`{user.xp}`')
 

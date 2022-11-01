@@ -12,15 +12,27 @@ cogs: list = [
 # Filter
 BLACKLIST: list = ["🇿", "🇻", "🇷🇺"]
 
+
 # Leveling
+
+class _Reward:
+    def __init__(self, reward_type: str, value: int):
+        self.reward_type = reward_type
+        self.value = value
+
+
 awards = {  # Roles
-    1: 1030995469163311186,
-    5: 1030996020747845662,
-    10: 1030996194677227580,
-    15: 1031205846073495552,
-    20: 1031205992563757087,
-    25: 1031206572363350026,
-    30: 1031206146687639592
+    1: _Reward("role", 1030995469163311186),
+    5: _Reward("role", 1030996020747845662),
+    10: _Reward("role", 1030996194677227580),
+    15: _Reward("role", 1031205846073495552),
+    20: _Reward("role", 1031205992563757087),
+    25: _Reward("role", 1031206572363350026),
+    30: _Reward("role", 1036956349080277042),
+    35: _Reward("role", 1031206572363350026),
+    40: _Reward("role", 1036956482123616276),
+    45: _Reward("role", 1031206146687639592),
+    50: _Reward("role", 1036956817516933120)
 }
 
 XP_MULTIPLIER = 0.25
