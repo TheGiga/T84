@@ -9,10 +9,10 @@ def progress_bar(percent: int) -> str:
     bar = ""
 
     for _ in range(raw_percents):
-        bar += "⬛"
+        bar += "🟨"
 
-    final = bar.ljust(10, "🟨")
-    return final[::-1]
+    final = bar.ljust(10, "⬛")
+    return final
 
 
 class Profile(discord.Cog):
