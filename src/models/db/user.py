@@ -47,6 +47,20 @@ class User(Model):
 
         return xp_tnl
 
+    async def apply_reward(self, award: config.Reward, guild: discord.Guild) -> str:
+        match award.reward_type:
+            case "role":
+                member_instance = await self.get_discord_instance(guild=guild)
+                role = guild.get_role(award.value)
+
+                if role is not None:
+                    await member_instance.add_roles(role)
+                    print(f"Rewarded {member_instance.name} with '{role.name}'")
+
+                return f"<@&{award.value}>"
+            case _:
+                return "None"
+
     async def get_discord_instance(self, guild: discord.Guild = None) -> discord.User | discord.Member | None:
         try:
             if guild is None:
@@ -77,51 +91,28 @@ class User(Model):
         level = self.xp_to_level(self.xp)
         level_gain = level - self.level
 
-        member_instance = await self.get_discord_instance(guild=guild)
-
-        if member_instance is None:
-            return level, False
-
         affected = True
-        rewards_roles = ""
+        rewards = ""
 
         if level_gain > 0:
-            for i in range(self.level, level+1):
-                award = config.awards.get(i)
+            member_instance = await self.get_discord_instance(guild=guild)
+
+            if member_instance is None:
+                return level, False, rewards
+
+            for i in range(self.level, level):
+                award = config.awards.get(i+1)
                 if award is None:
                     continue
 
-                match award.reward_type:
-                    case "role":
-                        role = guild.get_role(award.value)
+                apl_value = await self.apply_reward(award=award, guild=guild)
 
-                        if role is not None:
-                            await member_instance.add_roles(role)
-
-                        rewards_roles += f"<@&{award.value}> "
-                    case _:
-                        pass  # TODO: add vault
-
-        elif level_gain < 0:
-            for i in range(self.level, level-1, -1):
-                award = config.awards.get(i)
-                if award is None:
-                    continue
-
-                match award.reward_type:
-                    case "role":
-                        role = guild.get_role(award.value)
-
-                        if role is not None:
-                            await member_instance.remove_roles(role)
-                    case _:
-                        pass
-
+                rewards += f'{apl_value} '
         else:
             affected = False
 
         self.level = level
         await self.save()
 
-        rewards = rewards_roles if len(rewards_roles) > 0 else None
+        rewards = rewards if len(rewards) > 0 else None
         return level, affected, rewards
