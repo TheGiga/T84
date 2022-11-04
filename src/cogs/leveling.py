@@ -28,10 +28,11 @@ class Leveling(discord.Cog):
             discord_user = await user.get_discord_instance(guild=ctx.guild)
             leaderboard += f"{i}. {discord_user.mention if discord_user is not None else user.discord_id}: " \
                            f"`{user.xp} XP` `Lvl. {user.level}`\n"
-            i += 1
 
             if i == 10:
                 break
+
+            i += 1
 
         embed = DefaultEmbed()
         embed.title = "🎈 Топ 10 учасників за рівнем"
