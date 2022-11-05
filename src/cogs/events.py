@@ -56,7 +56,7 @@ class Events(discord.Cog):
         self.flag_endpoint = 'https://flagcdn.com/h240/{}.png'
         self.codes: dict = country_codes
 
-        self.channel_id = config.EVENT_CHANNEL_ID_TESTING
+        self.channel_id = config.EVENT_CHANNEL_ID
 
         self.random_flag_event.start()
 
