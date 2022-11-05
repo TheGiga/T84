@@ -75,7 +75,7 @@ class Events(discord.Cog):
 
         embed = DefaultEmbed()
         embed.title = "Що це за прапор?"
-        embed.description = "За правильну відповідь - нагорода `250 XP`"
+        embed.description = f"За правильну відповідь - нагорода `{config.FLAG_EVENT_XP_PRIZE} XP`"
         embed.colour.gold()
         embed.set_image(url=self.flag_endpoint.format(pick))
 
