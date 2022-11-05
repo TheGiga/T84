@@ -40,7 +40,11 @@ class FlagEventButton(discord.ui.Button):
         user.xp += config.FLAG_EVENT_XP_PRIZE
         await user.save()
 
-        await interaction.message.edit(view=self.view, embed=interaction.message.embeds[0].copy(), delete_after=30)
+        await interaction.message.edit(
+            view=self.view, embed=interaction.message.embeds[0].copy(),
+            content=f'{interaction.user.mention} дав правильну відповідь.',
+            delete_after=None
+        )
 
         await interaction.response.send_message(
             content=f'**{interaction.user.mention} відповів правильно!**\n'
@@ -48,6 +52,8 @@ class FlagEventButton(discord.ui.Button):
                     f'||Нагорода `{config.FLAG_EVENT_XP_PRIZE} XP`||',
             delete_after=30
         )
+
+        user_cache.clear()
 
 
 class Events(discord.Cog):
@@ -60,7 +66,7 @@ class Events(discord.Cog):
 
         self.random_flag_event.start()
 
-    @tasks.loop(minutes=random.randint(10, 30))
+    @tasks.loop(minutes=20)
     async def random_flag_event(self):
         await self.bot.wait_until_ready()
 
@@ -90,6 +96,8 @@ class Events(discord.Cog):
                 fake = random.choice(picks)
                 picks.remove(fake)
                 view.add_item(FlagEventButton(fake, False))
+
+        user_cache.clear()
 
         await channel.send(embed=embed, view=view, delete_after=240)
 
