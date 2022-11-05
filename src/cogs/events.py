@@ -45,7 +45,8 @@ class FlagEventButton(discord.ui.Button):
         await interaction.response.send_message(
             content=f'**{interaction.user.mention} відповів правильно!**\n'
                     f'Це був прапор: `{country_codes.get(self.code)}`\n\n'
-                    f'||Нагорода `{config.FLAG_EVENT_XP_PRIZE} XP`||'
+                    f'||Нагорода `{config.FLAG_EVENT_XP_PRIZE} XP`||',
+            delete_after=30
         )
 
 
@@ -59,7 +60,7 @@ class Events(discord.Cog):
 
         self.random_flag_event.start()
 
-    @tasks.loop(minutes=random.randint(30, 120))
+    @tasks.loop(minutes=random.randint(10, 30))
     async def random_flag_event(self):
         await self.bot.wait_until_ready()
 
