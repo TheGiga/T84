@@ -37,7 +37,7 @@ class FlagEventButton(discord.ui.Button):
         self.view.disable_all_items()
 
         user, _ = await User.get_or_create(discord_id=interaction.user.id)
-        user.xp += 250
+        user.xp += config.FLAG_EVENT_XP_PRIZE
         await user.save()
 
         await interaction.message.edit(view=self.view, embed=interaction.message.embeds[0].copy(), delete_after=30)

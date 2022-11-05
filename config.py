@@ -17,7 +17,7 @@ BLACKLIST: list = ["🇿", "🇻", "🇷🇺"]
 # Events
 EVENT_CHANNEL_ID: int = 997857862141345804
 EVENT_CHANNEL_ID_TESTING: int = 804835574515105834
-FLAG_EVENT_XP_PRIZE: int = 250
+FLAG_EVENT_XP_PRIZE: int = 50
 
 
 # Leveling
