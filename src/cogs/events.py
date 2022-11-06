@@ -1,4 +1,7 @@
+import asyncio
 import random
+import uuid
+
 import discord
 import config
 from discord.ext import tasks
@@ -7,53 +10,15 @@ from src import DefaultEmbed
 from src.models import User
 from src.static import country_codes
 
-user_cache: [int] = []
-
 
 class FlagEventButton(discord.ui.Button):
-    def __init__(self, country_code: str, primary=False):
+    def __init__(self, country_code: str):
         super().__init__()
         self.code: str = country_code
-        self.primary = primary
+        self.custom_id = f'{country_code}.{uuid.uuid4()}'
 
         self.label = country_codes.get(self.code)
         self.style = discord.ButtonStyle.grey
-
-    async def callback(self, interaction):
-        if interaction.user.id in user_cache:
-            return await interaction.response.send_message(
-                content='❌ Ви вже відповідали на цей івент.', ephemeral=True
-            )
-
-        if not self.primary:
-            user_cache.append(interaction.user.id)
-            return await interaction.response.send_message(
-                content='✖ Відповідь не вірна.', ephemeral=True
-            )
-
-        user_cache.append(interaction.user.id)
-
-        self.style = discord.ButtonStyle.green
-        self.view.disable_all_items()
-
-        user, _ = await User.get_or_create(discord_id=interaction.user.id)
-        user.xp += config.FLAG_EVENT_XP_PRIZE
-        await user.save()
-
-        await interaction.message.edit(
-            view=self.view, embed=interaction.message.embeds[0].copy(),
-            content=f'{interaction.user.mention} дав правильну відповідь.',
-            delete_after=None
-        )
-
-        await interaction.response.send_message(
-            content=f'**{interaction.user.mention} відповів правильно!**\n'
-                    f'Це був прапор: `{country_codes.get(self.code)}`\n\n'
-                    f'||Нагорода `{config.FLAG_EVENT_XP_PRIZE} XP`||',
-            delete_after=30
-        )
-
-        user_cache.clear()
 
 
 class Events(discord.Cog):
@@ -66,7 +31,7 @@ class Events(discord.Cog):
 
         self.random_flag_event.start()
 
-    @tasks.loop(minutes=20)
+    @tasks.loop(minutes=30)
     async def random_flag_event(self):
         await self.bot.wait_until_ready()
 
@@ -82,24 +47,54 @@ class Events(discord.Cog):
         embed = DefaultEmbed()
         embed.title = "Що це за прапор?"
         embed.description = f"За правильну відповідь - нагорода `{config.FLAG_EVENT_XP_PRIZE} XP`"
-        embed.colour.gold()
         embed.set_image(url=self.flag_endpoint.format(pick))
 
         view = discord.ui.View()
 
         place = random.randint(1, 4)
 
-        for i in range(1, 5):
+        for i in range(1, 5):  # Randomize button position
             if i == place:
-                view.add_item(FlagEventButton(pick, True))
+                view.add_item(FlagEventButton(pick))
             else:
                 fake = random.choice(picks)
                 picks.remove(fake)
-                view.add_item(FlagEventButton(fake, False))
+                view.add_item(FlagEventButton(fake))
 
-        user_cache.clear()
+        e_msg = await channel.send(embed=embed, view=view)
 
-        await channel.send(embed=embed, view=view, delete_after=240)
+        def guess_check(interaction: discord.Interaction):
+            # Splits custom id in half to get country code and checks if it's the one that was picked
+            return interaction.data.get('custom_id').split('.')[0] == pick
+
+        try:
+            guess: discord.Interaction = await self.bot.wait_for(
+                "interaction", check=guess_check, timeout=60.0
+            )
+        except asyncio.TimeoutError:
+            return await e_msg.delete()
+
+        btn = view.children[place-1]
+        btn.style = discord.ButtonStyle.green
+        view.children[place-1] = btn
+
+        view.disable_all_items()
+
+        await e_msg.edit(
+            content=f"**{guess.user.mention} відповів правильно!**",
+            embed=e_msg.embeds[0].copy(),
+            view=view
+        )
+
+        user, _ = await User.get_or_create(discord_id=guess.user.id)
+        user.xp += config.FLAG_EVENT_XP_PRIZE
+        await user.save()
+
+        await guess.response.send_message(
+            content=f'**Ви відповіли правильно!**\n'
+                    f'Нагорода `{config.FLAG_EVENT_XP_PRIZE} XP`',
+            ephemeral=True
+        )
 
 
 def setup(bot: discord.Bot):
