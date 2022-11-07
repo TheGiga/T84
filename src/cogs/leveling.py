@@ -53,8 +53,7 @@ class Leveling(discord.Cog):
 
         xp = random.randint(9, 13)
 
-        user.xp += xp
-        await user.save(update_fields=["xp"])
+        await user.add_xp(xp)
 
         lvl, affected, rewards = await user.update_levels(guild=message.guild)
 

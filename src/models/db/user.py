@@ -6,7 +6,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 import config
-from src import bot_instance
+from src import bot_instance, DefaultEmbed
 
 
 class User(Model):
@@ -37,6 +37,17 @@ class User(Model):
 
         return floor(lvl_raw)
 
+    @staticmethod
+    def next_level_progress_bar(percent: int) -> str:
+        raw_percents = percent // 10
+        bar = ""
+
+        for _ in range(raw_percents):
+            bar += "🟨"
+
+        final = bar.ljust(10, "⬛")
+        return final
+
     @property
     def xp_tnl(self) -> int:
         """
@@ -46,6 +57,49 @@ class User(Model):
         xp_tnl = xp_nl - self.xp
 
         return xp_tnl
+
+    async def add_xp(self, amount: int, notify_user: bool = False) -> None:
+        self.xp += amount
+        await self.save()
+
+        if notify_user:
+            discord_instance = await self.get_discord_instance()
+
+            if not discord_instance.can_send(discord.Message, discord.Embed):
+                return
+
+            embed = DefaultEmbed()
+
+            embed.set_author(name='ДТВУ', url=config.PG_INVITE)
+            embed.description = f"Вам нараховано **XP** у розмірі `{amount}`"
+
+            await discord_instance.send(embed=embed)
+
+    async def get_profile_embed(self) -> discord.Embed:
+        member = await self.get_discord_instance()
+
+        embed = DefaultEmbed()
+        embed.title = f"**Профіль користувача {member.display_name}**"
+
+        embed.add_field(name='⚖ Рівень', value=f'`{self.level}`')
+        embed.add_field(name='🎈 Досвід', value=f'`{self.xp}`')
+        embed.add_field(name='🔢 UID', value=f'`#{self.id}`')
+        embed.set_thumbnail(url=member.display_avatar.url)
+
+        xp_to_new_level = self.xp - self.level_to_xp(self.level)
+        xp_new_level = self.level_to_xp(self.level + 1) - self.level_to_xp(self.level)
+
+        percent = round((xp_to_new_level / xp_new_level) * 100)
+
+        embed.description = f"""
+                Прогрес до наступного рівню: `{self.xp}/{self.level_to_xp(self.level + 1)}`
+                > ```{self.level} {self.next_level_progress_bar(percent)} {self.level + 1}```
+                """
+
+        # Placeholder image to make embed have the same width everytime
+        embed.set_image(url="https://i.imgur.com/WozcNGD.png")
+
+        return embed
 
     async def apply_reward(self, award: config.Reward, guild: discord.Guild) -> str:
         match award.reward_type:
@@ -101,7 +155,7 @@ class User(Model):
                 return level, False, rewards
 
             for i in range(self.level, level):
-                award = config.awards.get(i+1)
+                award = config.awards.get(i + 1)
                 if award is None:
                     continue
 
