@@ -27,7 +27,6 @@ class Tracker(discord.Cog):
             return
 
         self.message_tracker_cache[message.author.id] = cached_value + 1
-        print(self.message_tracker_cache)
 
     @tasks.loop(minutes=5)
     async def message_tracker_cache_processing(self):
