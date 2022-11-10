@@ -4,16 +4,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-import sentry_sdk
+# import sentry_sdk
 
-sentry_debug = True if os.getenv("SENTRY_DEBUG") == "True" else False
-sentry_adress = f"http://{os.getenv('SENTRY_PK')}@38.242.131.170:9000/2"
+# sentry_debug = True if os.getenv("SENTRY_DEBUG") == "True" else False
+# sentry_address = f"http://{os.getenv('SENTRY_PK')}@38.242.131.170:9000/2"
 
-sentry_sdk.init(
-    dsn=sentry_adress,
-    debug=sentry_debug,
-    traces_sample_rate=1.0,
-)
+# sentry_sdk.init(
+#    dsn=sentry_address,
+#    debug=sentry_debug,
+#    traces_sample_rate=1.0,
+# )
 
 from tortoise import run_async
 from discord import ExtensionNotFound

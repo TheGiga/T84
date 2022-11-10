@@ -1,0 +1,18 @@
+class Reward:
+    def __init__(self, reward_type: str, value: int):
+        self.reward_type = reward_type
+        self.value = value
+
+
+awards = {  # Roles
+    1: Reward("role", 1030995469163311186),
+    5: Reward("role", 1030996020747845662),
+    10: Reward("role", 1030996194677227580),
+    15: Reward("role", 1031205846073495552),
+    20: Reward("role", 1031205992563757087),
+    25: Reward("role", 1036956349080277042),
+    30: Reward("role", 1031206572363350026),
+    35: Reward("role", 1036956482123616276),
+    40: Reward("role", 1031206146687639592),
+    45: Reward("role", 1036956817516933120)
+}

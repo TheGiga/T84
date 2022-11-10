@@ -14,6 +14,9 @@ class User(Model):
     discord_id = fields.IntField()
     xp = fields.IntField(default=0)
     level = fields.IntField(default=0)
+    message_count = fields.IntField(default=0)
+    balance = fields.IntField(default=0)
+    achievements = fields.JSONField(default=[])
 
     def __int__(self):
         return self.discord_id

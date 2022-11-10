@@ -4,7 +4,7 @@ from discord.ext.commands import MissingPermissions
 import config
 from art import tprint
 from .errors import GuildNotWhitelisted
-from sentry_sdk import capture_exception
+#from sentry_sdk import capture_exception
 
 _intents = discord.Intents.default()
 _intents.__setattr__("messages", True)
@@ -48,10 +48,11 @@ async def on_application_command_error(
 ):
     if isinstance(error, GuildNotWhitelisted):
         return
-    elif isinstance(error, MissingPermissions):
+
+    if isinstance(error, MissingPermissions):
         embed = discord.Embed(colour=discord.Colour.red(), title='⚠ Заборонено!')
         embed.description = f"❌ Вам не дозволено виконання цієї команди!"
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, ephemeral=True)
         return
 
     if isinstance(error, discord.ApplicationCommandInvokeError):
@@ -78,7 +79,7 @@ async def on_application_command_error(
         )
     )
 
-    capture_exception(error)
+    #capture_exception(error)
     raise error
 
 

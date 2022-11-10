@@ -18,6 +18,8 @@ class Leveling(discord.Cog):
     @guild_only()
     @discord.slash_command(name='top', description='🎈 Список лідерів по рівню.')
     async def top(self, ctx: discord.ApplicationContext):
+        await ctx.defer()
+
         query_set: list[User, Any] = await QuerySet(User).order_by('xp')
         query_set.reverse()
 
@@ -26,8 +28,8 @@ class Leveling(discord.Cog):
 
         for user in query_set:
             discord_user = await user.get_discord_instance(guild=ctx.guild)
-            leaderboard += f"{i}. {discord_user.mention if discord_user is not None else user.discord_id}: " \
-                           f"`{user.xp} XP` `Lvl. {user.level}`\n"
+            leaderboard += f"{i}. `Lvl. {user.level}` " \
+                           f"{discord_user.mention if discord_user is not None else user.discord_id}: `{user.xp} XP`\n"
 
             if i == 10:
                 break
