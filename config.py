@@ -26,6 +26,7 @@ FLAG_EVENT_XP_PRIZE: int = 50
 
 # Leveling
 
+Reward = rewards.Reward
 awards = rewards.awards
 
 XP_MULTIPLIER = 0.25
