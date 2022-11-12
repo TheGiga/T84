@@ -7,6 +7,7 @@ import config
 from discord.ext import tasks
 
 from src import DefaultEmbed
+from src.bot import T84
 from src.models import User
 from src.static import country_codes
 
@@ -22,7 +23,7 @@ class FlagEventButton(discord.ui.Button):
 
 
 class Events(discord.Cog):
-    def __init__(self, bot: discord.Bot):
+    def __init__(self, bot: T84):
         self.bot = bot
         self.flag_endpoint = 'https://flagcdn.com/h240/{}.png'
         self.codes: dict = country_codes
@@ -97,5 +98,5 @@ class Events(discord.Cog):
         )
 
 
-def setup(bot: discord.Bot):
+def setup(bot: T84):
     bot.add_cog(Events(bot=bot))

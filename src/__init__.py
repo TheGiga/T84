@@ -1,3 +1,3 @@
-from .bot import bot_instance, help_command_embed
+from .bot import bot_instance
 from .styling import DefaultEmbed
 from .errors import *

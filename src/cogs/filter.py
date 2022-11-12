@@ -1,9 +1,10 @@
 import discord
 import config
+from src.bot import T84
 
 
 class Filter(discord.Cog):
-    def __init__(self, bot: discord.Bot):
+    def __init__(self, bot: T84):
         self.bot = bot
 
     @discord.Cog.listener()
@@ -27,5 +28,5 @@ class Filter(discord.Cog):
                 pass
 
 
-def setup(bot: discord.Bot):
+def setup(bot: T84):
     bot.add_cog(Filter(bot=bot))

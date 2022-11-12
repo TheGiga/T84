@@ -1,10 +1,12 @@
 import discord
 from discord import guild_only
+
+from src.bot import T84
 from src.models import User
 
 
 class Profile(discord.Cog):
-    def __init__(self, bot: discord.Bot):
+    def __init__(self, bot: T84):
         self.bot = bot
 
     @guild_only()
@@ -26,5 +28,5 @@ class Profile(discord.Cog):
         await ctx.respond(embed=embed)
 
 
-def setup(bot: discord.Bot):
+def setup(bot: T84):
     bot.add_cog(Profile(bot))

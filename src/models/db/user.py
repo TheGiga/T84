@@ -79,17 +79,19 @@ class User(Model):
 
             await discord_instance.send(embed=embed)
 
-    async def add_achievement(self, value, notify_user: bool = False) -> None:
+    async def add_achievement(
+            self, achievement, notify_user: bool = False
+    ) -> None:
         current_achievements = list(self.achievements)
-        if value.payload in current_achievements:
+        if achievement.identifier in current_achievements:
             return
 
-        current_achievements.append(value.payload)
+        current_achievements.append(achievement.identifier)
         self.achievements = current_achievements
         await self.save()
 
         if notify_user:
-            from src.rewards import get_formatted_reward_string
+            from src.rewards import get_formatted_reward_string, Achievements
             discord_instance = await self.get_discord_instance()
 
             if not discord_instance.can_send(discord.Message, discord.Embed):
@@ -98,10 +100,10 @@ class User(Model):
             embed = DefaultEmbed()
 
             embed.set_author(name='ДТВУ', url=config.PG_INVITE)
-            embed.description = get_formatted_reward_string(value=value)
+            embed.description = f'\🔵 {str(Achievements.get_from_id(achievement.identifier))}'
             embed.colour = discord.Colour.blurple()
 
-            embed.set_footer(text=f'Код досягнення: {value.payload}')
+            embed.set_footer(text=f'Код досягнення: {achievement.identifier}')
 
             await discord_instance.send(embed=embed)
 

@@ -3,11 +3,12 @@ from discord import guild_only
 from typing import Union
 
 from src import DefaultEmbed
-from src.rewards import achievements, Achievement
+from src.bot import T84
+from src.rewards import Achievement, Achievements as AchievementsEnum
 
 
 class Achievements(discord.Cog):
-    def __init__(self, bot: discord.Bot):
+    def __init__(self, bot: T84):
         self.bot = bot
 
     @guild_only()
@@ -17,7 +18,7 @@ class Achievements(discord.Cog):
                 int, name='id', description="Номер досягнення. Усі досягнення пронумеровані по порядку."
             )
     ):
-        achievement: Union[Achievement, None] = achievements.get(identifier)
+        achievement: Union[Achievement, None] = AchievementsEnum.get_from_id(identifier)
 
         if achievement is None:
             return await ctx.respond(content="❌ Досягнення з таким номером не знайдено!", ephemeral=True)
@@ -38,5 +39,5 @@ class Achievements(discord.Cog):
         await ctx.respond(embed=embed)
 
 
-def setup(bot: discord.Bot):
+def setup(bot: T84):
     bot.add_cog(Achievements(bot=bot))

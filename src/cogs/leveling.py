@@ -5,12 +5,13 @@ from discord import guild_only
 from discord.ext import tasks
 from tortoise.queryset import QuerySet
 
+from src.bot import T84
 from src.models import Guild, User
 from src import DefaultEmbed
 
 
 class Leveling(discord.Cog):
-    def __init__(self, bot: discord.Bot):
+    def __init__(self, bot: T84):
         self.bot = bot
         self.cache = []
         self.caching_loop.start()
@@ -27,7 +28,7 @@ class Leveling(discord.Cog):
         i = 1
 
         for user in query_set:
-            discord_user = await user.get_discord_instance(guild=ctx.guild)
+            discord_user = await user.get_discord_instance()
             leaderboard += f"{i}. `Lvl. {user.level}` " \
                            f"{discord_user.mention if discord_user is not None else user.discord_id}: `{user.xp} XP`\n"
 
@@ -89,5 +90,5 @@ class Leveling(discord.Cog):
         self.cache.clear()
 
 
-def setup(bot: discord.Bot):
+def setup(bot: T84):
     bot.add_cog(Leveling(bot=bot))
