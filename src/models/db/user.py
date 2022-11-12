@@ -61,6 +61,50 @@ class User(Model):
 
         return xp_tnl
 
+    async def add_balance(self, amount: int, notify_user: bool = False) -> None:
+        self.balance += amount
+        await self.save()
+
+        if notify_user:
+            discord_instance = await self.get_discord_instance()
+
+            if not discord_instance.can_send(discord.Message, discord.Embed):
+                return
+
+            embed = DefaultEmbed()
+
+            embed.set_author(name='ДТВУ', url=config.PG_INVITE)
+            embed.description = f"Вам нараховано 🪙 **Баланс** у розмірі `{amount}`"
+            embed.colour = discord.Colour.gold()
+
+            await discord_instance.send(embed=embed)
+
+    async def add_achievement(self, value, notify_user: bool = False) -> None:
+        current_achievements = list(self.achievements)
+        if value.payload in current_achievements:
+            return
+
+        current_achievements.append(value.payload)
+        self.achievements = current_achievements
+        await self.save()
+
+        if notify_user:
+            from src.rewards import get_formatted_reward_string
+            discord_instance = await self.get_discord_instance()
+
+            if not discord_instance.can_send(discord.Message, discord.Embed):
+                return
+
+            embed = DefaultEmbed()
+
+            embed.set_author(name='ДТВУ', url=config.PG_INVITE)
+            embed.description = get_formatted_reward_string(value=value)
+            embed.colour = discord.Colour.blurple()
+
+            embed.set_footer(text=f'Код досягнення: {value.payload}')
+
+            await discord_instance.send(embed=embed)
+
     async def add_xp(self, amount: int, notify_user: bool = False) -> None:
         self.xp += amount
         await self.save()
@@ -74,7 +118,8 @@ class User(Model):
             embed = DefaultEmbed()
 
             embed.set_author(name='ДТВУ', url=config.PG_INVITE)
-            embed.description = f"Вам нараховано **XP** у розмірі `{amount}`"
+            embed.description = f"Вам нараховано 🎈 **XP** у розмірі `{amount}`"
+            embed.colour = discord.Colour.green()
 
             await discord_instance.send(embed=embed)
 
@@ -104,31 +149,20 @@ class User(Model):
 
         return embed
 
-    async def apply_reward(self, award: config.Reward, guild: discord.Guild) -> str:
-        match award.reward_type:
-            case "role":
-                member_instance = await self.get_discord_instance(guild=guild)
-                role = guild.get_role(award.value)
+    async def get_discord_instance(self, preload_guild: discord.Guild = None) -> discord.Member | None:
+        if preload_guild is None:
+            guild = bot_instance.get_guild(config.PARENT_GUILD)
 
-                if role is not None:
-                    await member_instance.add_roles(role)
-                    print(f"Rewarded {member_instance.name} with '{role.name}'")
-
-                return f"<@&{award.value}>"
-            case _:
-                return "None"
-
-    async def get_discord_instance(self, guild: discord.Guild = None) -> discord.User | discord.Member | None:
-        try:
             if guild is None:
-                user = await bot_instance.get_or_fetch_user(self.discord_id)
+                guild = await bot_instance.fetch_guild(config.PARENT_GUILD)
+        else:
+            guild = preload_guild
 
-                return user
-            else:
-                # user = await guild.get_or_fetch_member(self.discord_id)
-                user = await discord.utils.get_or_fetch(guild, 'member', self.discord_id, )
+        try:
+            # user = await guild.get_or_fetch_member(self.discord_id)
+            user = await discord.utils.get_or_fetch(guild, 'member', self.discord_id, )
 
-                return user
+            return user
         except NotFound:
             return None
 
@@ -149,22 +183,28 @@ class User(Model):
         level_gain = level - self.level
 
         affected = True
-        rewards = ""
+        rewards = "\n"
 
         if level_gain > 0:
-            member_instance = await self.get_discord_instance(guild=guild)
+            from src.rewards import Reward, get_formatted_reward_string
+            # Iterate through gained levels to add all lost rewards due to some reason.
+            member_instance = await self.get_discord_instance(preload_guild=guild)
 
             if member_instance is None:
+                # User left the guild or something happened.
                 return level, False, rewards
 
+            awards: list[Reward] = []
+
             for i in range(self.level, level):
-                award = config.awards.get(i + 1)
-                if award is None:
-                    continue
+                ext = config.leveled_rewards.get(i + 1)
 
-                apl_value = await self.apply_reward(award=award, guild=guild)
+                awards.extend(ext if ext is not None else [])
 
-                rewards += f'{apl_value} '
+            for award in awards:
+                reward_value = await award.apply_reward(self)
+                rewards += f'{get_formatted_reward_string(reward_value)}\n'
+
         else:
             affected = False
 
