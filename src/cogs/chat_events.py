@@ -66,7 +66,10 @@ class Events(discord.Cog):
 
         def guess_check(interaction: discord.Interaction):
             # Splits custom id in half to get country code and checks if it's the one that was picked
-            return interaction.data.get('custom_id').split('.')[0] == pick
+            try:
+                return interaction.data.get('custom_id').split('.')[0] == pick
+            except AttributeError:
+                return False
 
         try:
             guess: discord.Interaction = await self.bot.wait_for(

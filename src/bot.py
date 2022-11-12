@@ -61,7 +61,7 @@ class T84(discord.Bot, ABC):
         if isinstance(error, discord.ApplicationCommandInvokeError):
             await ctx.respond(
                 "Сталася невідома помилка, я доповів про цей кейс розробнику.\n\n"
-                "Якщо це буде повторюватись - напишіть розробнику: `gigalegit-#0880`"
+                "Якщо це буде повторюватись - напишіть розробнику: `gigalegit-#0880`\n"
                 "Якщо вам щось терміново потрібно - приєднуйтесь до серверу бота. *(кнопка нижче)*",
                 view=discord.ui.View(
                     discord.ui.Button(
