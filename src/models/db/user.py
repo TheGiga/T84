@@ -66,7 +66,10 @@ class User(Model):
             embed.description = f"Вам нараховано 🪙 **Баланс** у розмірі `{amount}`"
             embed.colour = discord.Colour.gold()
 
-            await discord_instance.send(embed=embed)
+            try:
+                await discord_instance.send(embed=embed)
+            except discord.Forbidden:
+                pass
 
     async def add_achievement(
             self, achievement, notify_user: bool = False
@@ -94,7 +97,10 @@ class User(Model):
 
             embed.set_footer(text=f'Код досягнення: {achievement.identifier}')
 
-            await discord_instance.send(embed=embed)
+            try:
+                await discord_instance.send(embed=embed)
+            except discord.Forbidden:
+                pass
 
     async def add_xp(self, amount: int, notify_user: bool = False) -> None:
         self.xp += amount
@@ -112,7 +118,10 @@ class User(Model):
             embed.description = f"Вам нараховано 🎈 **XP** у розмірі `{amount}`"
             embed.colour = discord.Colour.green()
 
-            await discord_instance.send(embed=embed)
+            try:
+                await discord_instance.send(embed=embed)
+            except discord.Forbidden:
+                pass
 
     async def get_profile_embed(self) -> discord.Embed:
         member = await self.get_discord_instance()
