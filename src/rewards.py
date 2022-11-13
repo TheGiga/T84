@@ -1,6 +1,7 @@
 from typing import Union
+
+from src.achievements import Achievements
 from src.models import User
-from enum import Enum
 
 
 class RewardValue:
@@ -10,8 +11,7 @@ class RewardValue:
 
 
 class Reward:
-    def __init__(self, leveled: bool, value: RewardValue):
-        self.leveled: bool = leveled
+    def __init__(self, value: RewardValue):
         self.value: RewardValue = value
 
     async def apply_reward(self, user: User) -> RewardValue:
@@ -40,61 +40,62 @@ class Reward:
                 return self.value
 
 
-class Achievement:
-    def __init__(self, identifier: int, text: str, long_text: str, secret: bool = False):
-        self.identifier: int = identifier
-        self.text: str = text
-        self.long_text: str = long_text
-        self.secret: bool = secret
-
-    def __str__(self):
-        return f'Досягнення: `{self.text}`'
-
-
-class MsgCountAchievement(Achievement):
-    def __init__(self, identifier: int, text: str, long_text: str, message_count: int):
-        super().__init__(identifier, text, long_text)
-        self.message_count = message_count
-
-
 leveled_awards = {  # Leveled
     1: [
-        Reward(True, RewardValue("role", 1030995469163311186)),
-        Reward(True, RewardValue("achievement", 1))
+        Reward(RewardValue("role", 1030995469163311186)),
+        Reward(RewardValue("achievement", 1)),
+        Reward(RewardValue("balance", 10))
     ],
-    5: [Reward(True, RewardValue("role", 1030996020747845662))],
-    10: [Reward(True, RewardValue("role", 1030996194677227580))],
-    15: [Reward(True, RewardValue("role", 1031205846073495552))],
-    20: [Reward(True, RewardValue("role", 1031205992563757087))],
-    25: [Reward(True, RewardValue("role", 1036956349080277042))],
-    30: [Reward(True, RewardValue("role", 1031206572363350026))],
-    35: [Reward(True, RewardValue("role", 1036956482123616276))],
-    40: [Reward(True, RewardValue("role", 1031206146687639592))],
-    45: [Reward(True, RewardValue("role", 1036956817516933120))]
+    2: [Reward(RewardValue("balance", 50))],
+    3: [Reward(RewardValue("balance", 70))],
+    5: [
+        Reward(RewardValue("role", 1030996020747845662)),
+        Reward(RewardValue("balance", 100))
+    ],
+    7: [Reward(RewardValue("balance", 150))],
+    10: [
+        Reward(RewardValue("role", 1030996194677227580)),
+        Reward(RewardValue("balance", 250))
+    ],
+    12: [Reward(RewardValue("balance", 350))],
+    15: [
+        Reward(RewardValue("role", 1031205846073495552)),
+        Reward(RewardValue("balance", 500))
+    ],
+    17: [Reward(RewardValue("balance", 650))],
+    20: [
+        Reward(RewardValue("role", 1031205992563757087)),
+        Reward(RewardValue("balance", 800))
+    ],
+    23: [Reward(RewardValue("balance", 1000))],
+    25: [
+        Reward(RewardValue("role", 1036956349080277042)),
+        Reward(RewardValue("balance", 1250))
+    ],
+    30: [
+        Reward(RewardValue("role", 1031206572363350026)),
+        Reward(RewardValue("balance", 1500))
+    ],
+    35: [
+        Reward(RewardValue("role", 1036956482123616276)),
+        Reward(RewardValue("balance", 3000))
+    ],
+    40: [
+        Reward(RewardValue("role", 1031206146687639592)),
+        Reward(RewardValue("balance", 5000))
+    ],
+    45: [
+        Reward(RewardValue("role", 1036956817516933120)),
+        Reward(RewardValue("achievement", 7)),
+        Reward(RewardValue("balance", 7500))
+    ],
+    50: [Reward(RewardValue("balance", 9000))],
+    60: [Reward(RewardValue("balance", 12000))],
+    70: [Reward(RewardValue("balance", 17000))],
+    80: [Reward(RewardValue("balance", 25000))],
+    90: [Reward(RewardValue("balance", 35000))],
+    100: [Reward(RewardValue("balance", 50000))]
 }
-
-
-class Achievements(Enum):
-    LVL_1 = Achievement(1, "Це тільки початок!", "Отримайте перший рівень")
-
-    MSG_1 = MsgCountAchievement(2, "Спамер I", "Написати 500 повідомлень!", 500)
-    MSG_2 = MsgCountAchievement(3, "Спамер II", "Написати 1000 повідомлень!", 1000)
-    MSG_3 = MsgCountAchievement(4, "Спамер III", "Написати 2000 повідомлень!", 2000)
-    MSG_4 = MsgCountAchievement(5, "Спамер IV", "Написати 5000 повідомлень!", 5000)
-    MSG_5 = MsgCountAchievement(6, "Спамер V", "Написати 10000 повідомлень!", 10000)
-
-    # Spizdil s drevnego koda Egor'a, sps Krashe85 <3
-    @classmethod
-    def get_from_id(cls, identifier: int):
-        for name, value in cls.__dict__.items():
-            try:
-                if name.startswith("_"):
-                    continue
-
-                if value.value.identifier == identifier:
-                    return value.value
-            except AttributeError:
-                continue
 
 
 def get_formatted_reward_string(value: RewardValue) -> str:

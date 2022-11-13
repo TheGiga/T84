@@ -6,7 +6,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 import config
-from src import bot_instance, DefaultEmbed
+from src import bot_instance, DefaultEmbed, progress_bar
 
 
 class User(Model):
@@ -39,17 +39,6 @@ class User(Model):
         lvl_raw = config.XP_MULTIPLIER * sqrt(xp)
 
         return floor(lvl_raw)
-
-    @staticmethod
-    def next_level_progress_bar(percent: int) -> str:
-        raw_percents = percent // 10
-        bar = ""
-
-        for _ in range(raw_percents):
-            bar += "🟨"
-
-        final = bar.ljust(10, "⬛")
-        return final
 
     @property
     def xp_tnl(self) -> int:
@@ -91,7 +80,6 @@ class User(Model):
         await self.save()
 
         if notify_user:
-            from src.rewards import get_formatted_reward_string, Achievements
             discord_instance = await self.get_discord_instance()
 
             if not discord_instance.can_send(discord.Message, discord.Embed):
@@ -99,8 +87,9 @@ class User(Model):
 
             embed = DefaultEmbed()
 
-            embed.set_author(name='ДТВУ', url=config.PG_INVITE)
-            embed.description = f'\🔵 {str(Achievements.get_from_id(achievement.identifier))}'
+            embed.set_author(name='ДТВУ | Досягнення', url=config.PG_INVITE)
+            embed.title = f'\🔵 {achievement.text}'
+            embed.description = f'{achievement.long_text}'
             embed.colour = discord.Colour.blurple()
 
             embed.set_footer(text=f'Код досягнення: {achievement.identifier}')
@@ -133,7 +122,8 @@ class User(Model):
 
         embed.add_field(name='⚖ Рівень', value=f'`{self.level}`')
         embed.add_field(name='🎈 Досвід', value=f'`{self.xp}`')
-        embed.add_field(name='🔢 UID', value=f'`#{self.id}`')
+        embed.add_field(name='🪙 Баланс', value=f'`{self.balance}`')
+
         embed.set_thumbnail(url=member.display_avatar.url)
 
         xp_to_new_level = self.xp - self.level_to_xp(self.level)
@@ -143,7 +133,7 @@ class User(Model):
 
         embed.description = f"""
                 Прогрес до наступного рівню: `{self.xp}/{self.level_to_xp(self.level + 1)}`
-                > ```{self.level} {self.next_level_progress_bar(percent)} {self.level + 1}```
+                > ```{self.level} {progress_bar(percent)} {self.level + 1}```
                 """
 
         # Placeholder image to make embed have the same width everytime

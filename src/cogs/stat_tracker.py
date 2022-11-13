@@ -4,7 +4,7 @@ from discord.ext import tasks
 import config
 from src.bot import T84
 from src.models import User
-from src.rewards import Achievements, MsgCountAchievement
+from src.achievements import Achievements, MsgCountAchievement
 
 
 class Tracker(discord.Cog):
@@ -32,10 +32,13 @@ class Tracker(discord.Cog):
 
     @tasks.loop(minutes=5)
     async def message_tracker_cache_processing(self):
-        await self.bot.wait_until_ready()
+        if not self.bot.is_ready():
+            return
+
         # This method should not be precise, it's pretty rough, but I don't really need precise numbers of user msg's.
 
         local_cache = self.message_tracker_cache.copy()
+
         message_count_achievements = tuple(
             ach for ach in Achievements if type(ach.value) is MsgCountAchievement
         )
