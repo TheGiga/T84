@@ -84,7 +84,7 @@ class Achievements(discord.Cog):
 
     @discord.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member | discord.User):
-        if user.guild is None:
+        if type(user) is discord.User:
             return
 
         if user.guild.id != config.PARENT_GUILD:
