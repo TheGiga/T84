@@ -6,8 +6,9 @@
 *if you find my code... well... somewhat maintnainable of course :D*
 
 # 🚀 This bot has following features:
-- Leveling
-- Achievement System (WIP)
+- Leveling & Rewards
+- Achievement System
+- Shop System
 - User profiles
 - Chat events
 
