@@ -100,8 +100,6 @@ async def overall_check(ctx: discord.ApplicationContext):
     from src.models import Guild, User
     # Guild creation if not present
 
-    await Guild.get_or_create(discord_id=ctx.guild_id)
-
     if ctx.guild_id not in [config.PARENT_GUILD, config.TESTING_GUILD]:
         await ctx.respond(
             content=f"❌ **Виконання цієї команди заборонено на зовнішніх серверах.**\n"
@@ -109,6 +107,8 @@ async def overall_check(ctx: discord.ApplicationContext):
                     f"Сервер бота -> {config.PG_INVITE}"
         )
         raise GuildNotWhitelisted(ctx.guild_id)
+
+    await Guild.get_or_create(discord_id=ctx.guild_id)
 
     # User creation if not present
     await User.get_or_create(discord_id=ctx.user.id)

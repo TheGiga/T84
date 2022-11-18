@@ -1,5 +1,4 @@
 import discord
-from discord import guild_only
 
 from src.bot import T84
 from src.models import User
@@ -9,11 +8,7 @@ class Profile(discord.Cog):
     def __init__(self, bot: T84):
         self.bot = bot
 
-    @guild_only()
-    @discord.slash_command(
-        name='profile',
-        description='👤 Перевірка профілю юзера.'
-    )
+    @discord.slash_command(name='profile', description='👤 Перевірка профілю юзера.')
     async def profile(
             self, ctx: discord.ApplicationContext,
             member: discord.Option(discord.Member, description="👤 Юзер") = None

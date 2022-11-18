@@ -91,7 +91,7 @@ class User(Model):
             embed = DefaultEmbed()
 
             embed.set_author(name='ДТВУ | Досягнення', url=config.PG_INVITE)
-            embed.title = f'\🔵 {achievement.text}'
+            embed.title = f'🔵 {achievement.text}'
             embed.description = f'{achievement.long_text}'
             embed.colour = discord.Colour.blurple()
 
@@ -124,14 +124,18 @@ class User(Model):
                 pass
 
     async def get_profile_embed(self) -> discord.Embed:
+        from src.achievements import Achievements
         member = await self.get_discord_instance()
 
         embed = DefaultEmbed()
         embed.title = f"**Профіль користувача {member.display_name}**"
 
         embed.add_field(name='⚖ Рівень', value=f'`{self.level}`')
-        embed.add_field(name='🎈 Досвід', value=f'`{self.xp}`')
-        embed.add_field(name='🪙 Баланс', value=f'`{self.balance}`')
+        embed.add_field(name='⚗ Досвід', value=f'`{self.xp}`')
+        embed.add_field(name='🏦 Баланс', value=f'`{self.balance}`')
+        embed.add_field(name='🐦 Повідомлення', value=f'`{self.message_count}`')
+        embed.add_field(name='⭐ Досягнення', value=f'`{len(self.achievements)}/{len(Achievements)}`')
+        embed.add_field(name='🔢 UID', value=f'`#{self.id}`')
 
         embed.set_thumbnail(url=member.display_avatar.url)
 
@@ -167,7 +171,7 @@ class User(Model):
         except NotFound:
             return None
 
-    async def update_levels(self, guild: discord.Guild) -> (int, bool, str | None):
+    async def update_levels(self) -> (int, bool, str | None):
         """
         Update user levels based on XP.
 
@@ -184,12 +188,12 @@ class User(Model):
         level_gain = level - self.level
 
         affected = True
-        rewards = "\n"
+        rewards = ""
 
         if level_gain > 0:
             from src.rewards import Reward, get_formatted_reward_string
             # Iterate through gained levels to add all lost rewards due to some reason.
-            member_instance = await self.get_discord_instance(preload_guild=guild)
+            member_instance = await self.get_discord_instance()
 
             if member_instance is None:
                 # User left the guild or something happened.
@@ -204,7 +208,7 @@ class User(Model):
 
             for award in awards:
                 reward_value = await award.apply_reward(self)
-                rewards += f'{get_formatted_reward_string(reward_value)}\n'
+                rewards += f'\n{get_formatted_reward_string(reward_value)}'
 
         else:
             affected = False

@@ -16,7 +16,7 @@ class FlagEventButton(discord.ui.Button):
     def __init__(self, country_code: str):
         super().__init__()
         self.code: str = country_code
-        self.custom_id = f'{country_code}.{uuid.uuid4()}'
+        self.custom_id = f'{country_code}/{uuid.uuid4()}'
 
         self.label = country_codes.get(self.code)
         self.style = discord.ButtonStyle.grey
@@ -32,7 +32,7 @@ class Events(discord.Cog):
 
         self.random_flag_event.start()
 
-    @tasks.loop(minutes=30)
+    @tasks.loop(minutes=60)
     async def random_flag_event(self):
         await self.bot.wait_until_ready()
 
@@ -47,7 +47,7 @@ class Events(discord.Cog):
 
         embed = DefaultEmbed()
         embed.title = "Що це за прапор?"
-        embed.description = f"За правильну відповідь - нагорода `{config.FLAG_EVENT_XP_PRIZE} XP`"
+        embed.description = f"За правильну відповідь - нагорода `{config.FLAG_EVENT_PRIZE} 💸`"
         embed.set_image(url=self.flag_endpoint.format(pick))
 
         view = discord.ui.View()
@@ -67,7 +67,7 @@ class Events(discord.Cog):
         def guess_check(interaction: discord.Interaction):
             # Splits custom id in half to get country code and checks if it's the one that was picked
             try:
-                return interaction.data.get('custom_id').split('.')[0] == pick
+                return interaction.data.get('custom_id').split('/')[0] == pick
             except AttributeError:
                 return False
 
@@ -91,12 +91,11 @@ class Events(discord.Cog):
         )
 
         user, _ = await User.get_or_create(discord_id=guess.user.id)
-        user.xp += config.FLAG_EVENT_XP_PRIZE
-        await user.save()
+        await user.add_balance(config.FLAG_EVENT_PRIZE)
 
         await guess.response.send_message(
             content=f'**Ви відповіли правильно!**\n'
-                    f'Нагорода `{config.FLAG_EVENT_XP_PRIZE} XP`',
+                    f'Нагорода `{config.FLAG_EVENT_PRIZE} 💸`',
             ephemeral=True
         )
 

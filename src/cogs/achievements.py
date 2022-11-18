@@ -1,5 +1,4 @@
 import discord
-from discord import guild_only
 from typing import Union
 
 import config
@@ -13,7 +12,6 @@ class Achievements(discord.Cog):
     def __init__(self, bot: T84):
         self.bot = bot
 
-    @guild_only()
     @discord.slash_command(name='achievements', description='⭐ Подивитися інформацію про досягнення користувача.')
     async def achievements(
             self, ctx: discord.ApplicationContext,
@@ -53,9 +51,8 @@ class Achievements(discord.Cog):
         """
 
         await ctx.respond(embed=embed)
-        await user.add_achievement(achievement=AchievementsEnum.get_from_id(8), notify_user=True)
+        # await user.add_achievement(achievement=AchievementsEnum.get_from_id(8), notify_user=True)
 
-    @guild_only()
     @discord.slash_command(name='achievement', description='⭐ Подивитися інформацію про досягнення.')
     async def achievement(
             self, ctx: discord.ApplicationContext, identifier: discord.Option(

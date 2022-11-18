@@ -1,7 +1,6 @@
 import random
 import discord
 from typing import Any
-from discord import guild_only
 from discord.ext import tasks
 from tortoise.queryset import QuerySet
 
@@ -17,8 +16,7 @@ class Leveling(discord.Cog):
         self.cache = []
         self.caching_loop.start()
 
-    @guild_only()
-    @discord.slash_command(name='reward', description='🎈 Список нагород для вказаного рівню.')
+    @discord.slash_command(name='reward', description='⚗ Список нагород для вказаного рівню.')
     async def reward(
             self, ctx: discord.ApplicationContext, level: discord.Option(int, description='Рівень')
     ):
@@ -43,8 +41,7 @@ class Leveling(discord.Cog):
 
         await ctx.respond(embed=embed)
 
-    @guild_only()
-    @discord.slash_command(name='top', description='🎈 Список лідерів по рівню.')
+    @discord.slash_command(name='top', description='⚗ Список лідерів по рівню.')
     async def top(self, ctx: discord.ApplicationContext):
         await ctx.defer()
 
@@ -65,27 +62,31 @@ class Leveling(discord.Cog):
             i += 1
 
         embed = DefaultEmbed()
-        embed.title = "🎈 Топ 10 учасників за рівнем"
+        embed.title = "⚗ Топ 10 учасників за рівнем"
         embed.description = leaderboard
 
         await ctx.respond(embed=embed)
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.guild is None:
+        if message.guild is None or message.author.bot:
             return
 
         if message.author.id in self.cache or message.author.bot:
             return
 
-        await Guild.get_or_create(discord_id=message.guild.id)
+        db_guild = await Guild.get_or_none(discord_id=message.guild.id)
+
+        if db_guild is None:
+            return
+
         user, _ = await User.get_or_create(discord_id=message.author.id)
 
         xp = random.randint(9, 13)
 
         await user.add_xp(xp)
 
-        lvl, affected, rewards = await user.update_levels(guild=message.guild)
+        lvl, affected, rewards = await user.update_levels()
 
         if affected:
 
@@ -99,13 +100,14 @@ class Leveling(discord.Cog):
             embed.description = desc
 
             embed.add_field(name='⚖ Рівень', value=f"`{lvl}`")
-            embed.add_field(name='🎈 Досвід', value=f'`{user.xp}`')
+            embed.add_field(name='⚗ Досвід', value=f'`{user.xp}`')
+            embed.add_field(name='🐦 Повідомлення', value=f'`{user.message_count}`')
 
             try:
                 await message.reply(
                     embed=embed,
                     content=f"{message.author.mention}",
-                    delete_after=20.0
+                    delete_after=60.0
                 )
             except discord.HTTPException:
                 pass

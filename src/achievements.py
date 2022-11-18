@@ -1,20 +1,26 @@
 from enum import Enum
+from typing import TypeVar, Type
+
+A = TypeVar("A", bound='Achievement')
 
 
 class Achievement:
     def __init__(self, identifier: int, text: str, long_text: str, secret: bool = False):
-        self.identifier: int = identifier
-        self.text: str = text
-        self.long_text: str = long_text
-        self.secret: bool = secret
+        self.identifier = identifier
+        self.text = text
+        self.long_text = long_text
+        self.secret = secret
 
     def __str__(self):
         return f'Досягнення: `{self.text}`'
 
+    def __repr__(self):
+        return self.__str__()
+
 
 class MsgCountAchievement(Achievement):
-    def __init__(self, identifier: int, text: str, long_text: str, message_count: int):
-        super().__init__(identifier, text, long_text)
+    def __init__(self, identifier: int, text: str, long_text: str, message_count: int, secret: bool = False):
+        super().__init__(identifier, text, long_text, secret)
         self.message_count = message_count
 
 
@@ -33,7 +39,7 @@ class Achievements(Enum):
 
     # Spizdil s drevnego koda Egor'a, sps Krashe85 <3
     @classmethod
-    def get_from_id(cls, identifier: int):
+    def get_from_id(cls: Type[A], identifier: int) -> A | None:
         for name, value in cls.__dict__.items():
             try:
                 if name.startswith("_"):
@@ -43,3 +49,5 @@ class Achievements(Enum):
                     return value.value
             except AttributeError:
                 continue
+
+        return None
