@@ -13,9 +13,9 @@ class AdminCommands(discord.Cog):
     def __init__(self, bot: T84):
         self.bot = bot
 
-    admin = discord.SlashCommandGroup('admin', "⚠ Адміністративні команди.")
+    admin = discord.SlashCommandGroup('admin', "🛑 Адміністративні команди.")
 
-    @admin.command(name='add_balance', description='⚠ Добавити баланс.')
+    @admin.command(name='add_balance', description='🛑 Добавити баланс.')
     @commands.check(admin_check)
     async def adm_add_balance(
             self, ctx: discord.ApplicationContext, amount: int,

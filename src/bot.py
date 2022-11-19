@@ -107,9 +107,8 @@ async def on_ready():
 @bot_instance.check
 async def overall_check(ctx: discord.ApplicationContext):
     from src.models import Guild, User
-    # Guild creation if not present
 
-    if ctx.guild_id not in [config.PARENT_GUILD, config.TESTING_GUILD]:
+    if ctx.guild_id not in (config.PARENT_GUILD, config.TESTING_GUILD):
         await ctx.respond(
             content=f"❌ **Виконання цієї команди заборонено на зовнішніх серверах.**\n"
                     f"*Якщо ви переконані що це помилка - зв'яжіться з розробником `gigalegit-#0880`*\n\n"
@@ -117,6 +116,7 @@ async def overall_check(ctx: discord.ApplicationContext):
         )
         raise GuildNotWhitelisted(ctx.guild_id)
 
+    # Guild creation if not present | For future
     await Guild.get_or_create(discord_id=ctx.guild_id)
 
     # User creation if not present
