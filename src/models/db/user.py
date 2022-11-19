@@ -10,8 +10,6 @@ import config
 from src import bot_instance, DefaultEmbed, progress_bar
 
 
-# TODO: Add get_discord_instance() caching
-
 class User(Model):
     id = fields.IntField(pk=True)
     discord_id = fields.IntField()
@@ -153,8 +151,7 @@ class User(Model):
 
         try:
             # user = await guild.get_or_fetch_member(self.discord_id)
-            user = await discord.utils.get_or_fetch(guild, 'member', self.discord_id, )
-
+            user = await discord.utils.get_or_fetch(guild, 'member', self.discord_id)
             return user
         except NotFound:
             return None
