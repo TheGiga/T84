@@ -28,7 +28,7 @@ from src.database import db_init
 def main():
     fmt = '[%(levelname)s] %(asctime)s - %(message)s'
     file = f'logs/{dt.strftime(dt.utcnow(), "[%b] %d.%m.%Y (%Hh%Mm%Ss)")}.log'
-    logging.basicConfig(level=logging.INFO, format=fmt, filename=file)
+    logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
 
     for cog in config.cogs:
         try:
