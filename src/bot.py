@@ -1,7 +1,9 @@
+import logging
 from abc import ABC
 
 import discord
 from discord.ext.commands import MissingPermissions
+from discord.errors import CheckFailure
 
 import config
 from art import tprint
@@ -58,6 +60,12 @@ class T84(discord.Bot, ABC):
             await ctx.respond(embed=embed, ephemeral=True)
             return
 
+        if isinstance(error, CheckFailure):
+            embed = discord.Embed(colour=discord.Colour.red(), title='⚠ Заборонено!')
+            embed.description = f"❌ Помилка перевірки!"
+            await ctx.respond(embed=embed, ephemeral=True)
+            return
+
         if isinstance(error, discord.ApplicationCommandInvokeError):
             await ctx.respond(
                 "Сталася невідома помилка, я доповів про цей кейс розробнику.\n\n"
@@ -83,6 +91,7 @@ class T84(discord.Bot, ABC):
         )
 
         # capture_exception(error)
+        logging.error(error)
         raise error
 
 

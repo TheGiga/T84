@@ -16,7 +16,7 @@ class Leveling(discord.Cog):
         self.cache = []
         self.caching_loop.start()
 
-    @discord.slash_command(name='reward', description='⚗ Список нагород для вказаного рівню.')
+    @discord.slash_command(name='reward', description='🔮 Список нагород для вказаного рівню.')
     async def reward(
             self, ctx: discord.ApplicationContext, level: discord.Option(int, description='Рівень')
     ):
@@ -41,25 +41,18 @@ class Leveling(discord.Cog):
 
         await ctx.respond(embed=embed)
 
-    @discord.slash_command(name='top', description='⚗ Список лідерів по рівню.')
+    @discord.slash_command(name='top', description='🔮 Список лідерів по рівню.')
     async def top(self, ctx: discord.ApplicationContext):
         await ctx.defer()
 
-        query_set: list[User, Any] = await QuerySet(User).order_by('xp')
-        query_set.reverse()
+        query_set: list[User, Any] = await QuerySet(User).order_by('-xp').limit(10)
 
         leaderboard = ""
-        i = 1
 
-        for user in query_set:
+        for i, user in enumerate(query_set, 1):
             discord_user = await user.get_discord_instance()
             leaderboard += f"{i}. `Lvl. {user.level}` " \
                            f"{discord_user.mention if discord_user is not None else user.discord_id}: `{user.xp} XP`\n"
-
-            if i == 10:
-                break
-
-            i += 1
 
         embed = DefaultEmbed()
         embed.title = "⚗ Топ 10 учасників за рівнем"

@@ -72,13 +72,13 @@ class Select(discord.ui.Select):
 
         if cart_cost > user.balance:
             embed.colour = discord.Colour.red()
-            embed.title = "❌ Вам не вистачає балансу для покупки"
+            embed.title = "❌ Вам не вистачає балансу для придбання"
 
             return await interaction.response.send_message(embed=embed, ephemeral=True)
 
         await interaction.response.send_message(content='✅ Для подальших дій перейдіть в ЛС до боту.', ephemeral=True)
 
-        embed.title = "✅ Підтвердіть свою покупку"
+        embed.title = "✅ Підтвердіть своє придбання"
         embed.colour = discord.Colour.green()
 
         view = discord.ui.View()
@@ -86,7 +86,7 @@ class Select(discord.ui.Select):
 
         await interaction.user.send(
             content="⚠ Якщо ви передумали, то просто ігноруйте це повідомлення.",
-            embed=embed, view=view, delete_after=240.0
+            embed=embed, view=view
         )
 
 
@@ -99,9 +99,6 @@ class Shop(discord.Cog):
             self, ctx: discord.ApplicationContext, shop_type: discord.Option(name="category", choices=['roles'])
     ):
         await ctx.defer()
-
-        if shop_type is None:
-            return await ctx.respond(content='❌ Сталася помилка... Повідомте про це розробнику.', ephemeral=True)
 
         shop_items = tuple(x for x in ShopItems if x.value.value.code == shop_type)
 

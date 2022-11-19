@@ -1,20 +1,23 @@
 from src.rewards import leveled_awards
 
-PARENT_GUILD: int = 997857861705146368
+PARENT_GUILD: int = 997857861705146368  # 804835509968568351
 PARENT_GUILD_MAIN_CHAT: int = 997857862141345804
 TESTING_GUILD: int = 804835509968568351
 TESTING_BOT: int = 996288139620524093
 PG_INVITE: str = "https://discord.gg/8GHx6ak8cs"
 
+ADMINS: list[int] = [352062534469156864, 690237585372610560]
+
 cogs: list = [
+    "src.cogs.shop",
+    "src.cogs.help",
+    "src.cogs.admin",
     "src.cogs.filter",
     "src.cogs.profile",
     "src.cogs.leveling",
-    "src.cogs.help",
     "src.cogs.chat_events",
     "src.cogs.stat_tracker",
     "src.cogs.achievements",
-    "src.cogs.shop"
 ]
 
 # Filter

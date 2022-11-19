@@ -1,9 +1,12 @@
 import os
+import uuid
+from datetime import datetime as dt
 from dotenv import load_dotenv
 
 load_dotenv()
 
 import config
+import logging
 
 # import sentry_sdk
 
@@ -22,7 +25,12 @@ from src import bot_instance
 
 from src.database import db_init
 
-if __name__ == "__main__":
+
+def main():
+    fmt = '[%(levelname)s] %(asctime)s - %(message)s'
+    file = f'logs/{dt.strftime(dt.utcnow(), "[%b] %d.%m.%Y (%Mm%Ss)")}.txt'
+    logging.basicConfig(level=logging.INFO, format=fmt, filename=file)
+
     for cog in config.cogs:
         try:
             bot_instance.load_extension(cog)
@@ -32,3 +40,7 @@ if __name__ == "__main__":
 
     run_async(db_init())
     bot_instance.run(os.getenv("TOKEN"))
+
+
+if __name__ == "__main__":
+    main()

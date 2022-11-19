@@ -22,6 +22,12 @@ class Profile(discord.Cog):
 
         await ctx.respond(embed=embed)
 
+    @discord.slash_command(name='balance', description='👤 Перевірити свій баланс.')
+    async def balance(self, ctx: discord.ApplicationContext):
+        user = await User.get(discord_id=ctx.author.id)
+
+        await ctx.respond(f"Ваш баланс: **{user.balance}** 💸", ephemeral=True)
+
 
 def setup(bot: T84):
     bot.add_cog(Profile(bot))

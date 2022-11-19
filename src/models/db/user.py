@@ -1,3 +1,4 @@
+import logging
 from math import sqrt, floor
 
 import discord
@@ -8,6 +9,8 @@ from tortoise.models import Model
 import config
 from src import bot_instance, DefaultEmbed, progress_bar
 
+
+# TODO: Add get_discord_instance() caching
 
 class User(Model):
     id = fields.IntField(pk=True)
@@ -50,26 +53,27 @@ class User(Model):
 
         return xp_tnl
 
+    async def send_embed(self, embed: discord.Embed) -> None:
+        discord_instance = await self.get_discord_instance()
+
+        try:
+            await discord_instance.send(embed=embed)
+        except discord.Forbidden:
+            logging.info(f"Couldn't send message to {discord_instance.id}, most likely due to closed DM's.")
+            pass
+
     async def add_balance(self, amount: int, notify_user: bool = False) -> None:
         self.balance += amount
         await self.save()
 
         if notify_user:
-            discord_instance = await self.get_discord_instance()
-
-            if not discord_instance.can_send(discord.Message, discord.Embed):
-                return
-
             embed = DefaultEmbed()
 
             embed.set_author(name='ДТВУ', url=config.PG_INVITE)
-            embed.description = f"Вам нараховано 🪙 **Баланс** у розмірі `{amount}`"
+            embed.description = f"Вам нараховано 💸 **Баланс** у розмірі `{amount}`"
             embed.colour = discord.Colour.gold()
 
-            try:
-                await discord_instance.send(embed=embed)
-            except discord.Forbidden:
-                pass
+            await self.send_embed(embed)
 
     async def add_achievement(
             self, achievement, notify_user: bool = False
@@ -83,11 +87,6 @@ class User(Model):
         await self.save()
 
         if notify_user:
-            discord_instance = await self.get_discord_instance()
-
-            if not discord_instance.can_send(discord.Message, discord.Embed):
-                return
-
             embed = DefaultEmbed()
 
             embed.set_author(name='ДТВУ | Досягнення', url=config.PG_INVITE)
@@ -97,31 +96,20 @@ class User(Model):
 
             embed.set_footer(text=f'Код досягнення: {achievement.identifier}')
 
-            try:
-                await discord_instance.send(embed=embed)
-            except discord.Forbidden:
-                pass
+            await self.send_embed(embed)
 
     async def add_xp(self, amount: int, notify_user: bool = False) -> None:
         self.xp += amount
         await self.save()
 
         if notify_user:
-            discord_instance = await self.get_discord_instance()
-
-            if not discord_instance.can_send(discord.Message, discord.Embed):
-                return
-
             embed = DefaultEmbed()
 
             embed.set_author(name='ДТВУ', url=config.PG_INVITE)
             embed.description = f"Вам нараховано 🎈 **XP** у розмірі `{amount}`"
             embed.colour = discord.Colour.green()
 
-            try:
-                await discord_instance.send(embed=embed)
-            except discord.Forbidden:
-                pass
+            await self.send_embed(embed)
 
     async def get_profile_embed(self) -> discord.Embed:
         from src.achievements import Achievements
