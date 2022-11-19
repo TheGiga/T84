@@ -1,5 +1,4 @@
 import os
-import uuid
 from datetime import datetime as dt
 from dotenv import load_dotenv
 
@@ -28,7 +27,7 @@ from src.database import db_init
 
 def main():
     fmt = '[%(levelname)s] %(asctime)s - %(message)s'
-    file = f'logs/{dt.strftime(dt.utcnow(), "[%b] %d.%m.%Y (%Mm%Ss)")}.txt'
+    file = f'logs/{dt.strftime(dt.utcnow(), "[%b] %d.%m.%Y (%Hh%Mm%Ss)")}.log'
     logging.basicConfig(level=logging.INFO, format=fmt, filename=file)
 
     for cog in config.cogs:

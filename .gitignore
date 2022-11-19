@@ -2,7 +2,7 @@ Dockerfile
 *.db
 *.db*
 
-/logs/*
+/logs/*.log
 
 ### Python template
 # Byte-compiled / optimized / DLL files

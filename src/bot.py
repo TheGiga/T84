@@ -67,7 +67,7 @@ class T84(discord.Bot, ABC):
             return
 
         if isinstance(error, discord.ApplicationCommandInvokeError):
-            await ctx.respond(
+            await ctx.send(
                 "Сталася невідома помилка, я доповів про цей кейс розробнику.\n\n"
                 "Якщо це буде повторюватись - напишіть розробнику: `gigalegit-#0880`\n"
                 "Якщо вам щось терміново потрібно - приєднуйтесь до серверу бота. *(кнопка нижче)*",
@@ -82,13 +82,16 @@ class T84(discord.Bot, ABC):
                 ),
             )
 
-        await ctx.respond(
-            embed=discord.Embed(
-                title=error.__class__.__name__,
-                description=str(error),
-                color=discord.Colour.embed_background(),
+        try:
+            await ctx.respond(
+                embed=discord.Embed(
+                    title=error.__class__.__name__,
+                    description=str(error),
+                    color=discord.Colour.embed_background(),
+                )
             )
-        )
+        except discord.NotFound:
+            pass
 
         # capture_exception(error)
         logging.error(error)
