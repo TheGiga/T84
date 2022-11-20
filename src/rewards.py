@@ -103,6 +103,6 @@ def get_formatted_reward_string(value: RewardValue) -> str:
         case "role":
             return f"\🟡 <@&{value.payload}>"
         case "balance":
-            return f'\🟢 {value.payload} '
+            return f'\🟢 {value.payload} 💸'
         case "achievement":
             return f'\🔵 {str(Achievements.get_from_id(value.payload))}'

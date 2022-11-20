@@ -48,6 +48,10 @@ class T84(discord.Bot, ABC):
 
         return embed
 
+    async def on_ready(self):
+        tprint("T84")
+        print(f"Bot is ready, logged in as {self.user}")
+
     async def on_application_command_error(
             self, ctx: discord.ApplicationContext, error: discord.ApplicationCommandError
     ):
@@ -99,12 +103,6 @@ class T84(discord.Bot, ABC):
 
 
 bot_instance = T84(intents=_intents)
-
-
-@bot_instance.event
-async def on_ready():
-    tprint("T84")
-    print(f"Bot is ready, logged in as {bot_instance.user}")
 
 
 @bot_instance.check
