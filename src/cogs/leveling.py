@@ -6,7 +6,6 @@ from tortoise.queryset import QuerySet
 
 from src.bot import T84
 from src.models import Guild, User
-from src.rewards import leveled_awards, Reward, get_formatted_reward_string
 from src import DefaultEmbed
 
 
@@ -15,31 +14,6 @@ class Leveling(discord.Cog):
         self.bot = bot
         self.cache = []
         self.caching_loop.start()
-
-    @discord.slash_command(name='reward', description='🔮 Список нагород для вказаного рівню.')
-    async def reward(
-            self, ctx: discord.ApplicationContext, level: discord.Option(int, description='Рівень')
-    ):
-        rewards: list[Reward] = leveled_awards.get(level)
-
-        embed = DefaultEmbed()
-
-        if rewards is None:
-            embed.title = "???"
-            embed.description = "❌ На цьому рівні немає нагород."
-
-            return await ctx.respond(embed=embed)
-
-        embed.title = f"Нагороди {level}-ого рівню"
-
-        desc = ""
-
-        for reward in rewards:
-            desc += f"{get_formatted_reward_string(reward.value)}\n"
-
-        embed.description = desc
-
-        await ctx.respond(embed=embed)
 
     @discord.slash_command(name='top', description='🔮 Список лідерів по рівню.')
     async def top(self, ctx: discord.ApplicationContext):

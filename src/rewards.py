@@ -14,7 +14,10 @@ class Reward:
     def __init__(self, value: RewardValue):
         self.value: RewardValue = value
 
-    async def apply_reward(self, user: User) -> RewardValue:
+    def __repr__(self):
+        return get_formatted_reward_string(self.value)
+
+    async def apply(self, user: User) -> RewardValue:
         """
         :param user: src.models.User
         :return: RewardValue(code, payload): Code - string name of reward type, payload - it's actual value
@@ -40,7 +43,7 @@ class Reward:
                 return self.value
 
 
-leveled_awards = {  # Leveled
+leveled_rewards = {  # Leveled
     1: [
         Reward(RewardValue("role", 1030995469163311186)),
         Reward(RewardValue("achievement", 1)),
@@ -101,8 +104,8 @@ leveled_awards = {  # Leveled
 def get_formatted_reward_string(value: RewardValue) -> str:
     match value.code:
         case "role":
-            return f"\🟡 <@&{value.payload}>"
+            return f"🟡 <@&{value.payload}>"
         case "balance":
-            return f'\🟢 {value.payload} 💸'
+            return f'🟢 {value.payload} 💸'
         case "achievement":
-            return f'\🔵 {str(Achievements.get_from_id(value.payload))}'
+            return f'🔵 {str(Achievements.get_from_id(value.payload))}'

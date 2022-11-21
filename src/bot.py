@@ -21,6 +21,7 @@ class T84(discord.Bot, ABC):
     def __init__(self, *args, **options):
         super().__init__(*args, **options)
 
+    # Should be re-written vvv
     def help_command_embed(self) -> discord.Embed:
         embed = discord.Embed(colour=discord.Colour.embed_background(), timestamp=discord.utils.utcnow())
         embed.title = 'Допомога'
@@ -31,6 +32,9 @@ class T84(discord.Bot, ABC):
         for command in self.commands:
             match command.__class__:
                 case discord.SlashCommandGroup:
+                    if command.name == "admin":
+                        continue
+
                     sub_commands = ''
                     for sub_command in command.subcommands:
                         sub_commands += f'> `{sub_command.name}` - {sub_command.description}\n'

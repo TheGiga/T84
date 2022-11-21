@@ -7,7 +7,8 @@ from tortoise import fields
 from tortoise.models import Model
 
 import config
-from src import bot_instance, DefaultEmbed, progress_bar
+from src import bot_instance, DefaultEmbed
+from src.utils import progress_bar
 
 
 class User(Model):
@@ -109,6 +110,11 @@ class User(Model):
 
             await self.send_embed(embed)
 
+    # Applies multiple rewards to user
+    async def apply_rewards(self, rewards: tuple):
+        for r in rewards:
+            await r.apply(self)
+
     async def get_profile_embed(self) -> discord.Embed:
         from src.achievements import Achievements
         member = await self.get_discord_instance()
@@ -177,6 +183,7 @@ class User(Model):
 
         if level_gain > 0:
             from src.rewards import Reward, get_formatted_reward_string
+            from src.rewards import leveled_rewards
             # Iterate through gained levels to add all lost rewards due to some reason.
             member_instance = await self.get_discord_instance()
 
@@ -187,12 +194,12 @@ class User(Model):
             awards: list[Reward] = []
 
             for i in range(self.level, level):
-                ext = config.leveled_rewards.get(i + 1)
+                ext = leveled_rewards.get(i + 1)
 
                 awards.extend(ext if ext is not None else [])
 
             for award in awards:
-                reward_value = await award.apply_reward(self)
+                reward_value = await award.apply(self)
                 rewards += f'\n{get_formatted_reward_string(reward_value)}'
 
         else:

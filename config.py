@@ -1,6 +1,4 @@
-from src.rewards import leveled_awards
-
-PARENT_GUILD: int = 997857861705146368  # 804835509968568351
+PARENT_GUILD: int = 997857861705146368  # 1043609397672288329
 PARENT_GUILD_MAIN_CHAT: int = 997857862141345804
 
 TESTING_GUILD: int = 1043609397672288329
@@ -18,6 +16,7 @@ cogs: list = [
     "src.cogs.admin",
     "src.cogs.filter",
     "src.cogs.profile",
+    "src.cogs.rewards",
     "src.cogs.leveling",
     "src.cogs.chat_events",
     "src.cogs.stat_tracker",
@@ -34,7 +33,5 @@ FLAG_EVENT_PRIZE: int = 10
 
 
 # Leveling
-
-leveled_rewards = leveled_awards
 
 XP_MULTIPLIER = 0.25
