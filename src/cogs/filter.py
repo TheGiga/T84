@@ -1,5 +1,4 @@
 import discord
-import config
 from src.bot import T84
 
 
@@ -15,7 +14,7 @@ class Filter(discord.Cog):
         if not payload.emoji.is_unicode_emoji():
             return
 
-        if payload.emoji.__str__() in config.BLACKLIST:
+        if payload.emoji.__str__() in self.bot.config.BLACKLIST:
             guild = self.bot.get_guild(payload.guild_id)
             channel = guild.get_channel_or_thread(payload.channel_id)
             message = await channel.fetch_message(payload.message_id)

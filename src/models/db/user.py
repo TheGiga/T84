@@ -52,6 +52,14 @@ class User(Model):
 
         return xp_tnl
 
+    @property
+    def l_tnl_percent(self) -> int:
+        """From current level to new level in percents"""
+        xp_to_new_level = self.xp - self.level_to_xp(self.level)
+        xp_new_level = self.level_to_xp(self.level + 1) - self.level_to_xp(self.level)
+
+        return round((xp_to_new_level / xp_new_level) * 100)
+
     async def send_embed(self, embed: discord.Embed) -> None:
         discord_instance = await self.get_discord_instance()
 
@@ -131,14 +139,9 @@ class User(Model):
 
         embed.set_thumbnail(url=member.display_avatar.url)
 
-        xp_to_new_level = self.xp - self.level_to_xp(self.level)
-        xp_new_level = self.level_to_xp(self.level + 1) - self.level_to_xp(self.level)
-
-        percent = round((xp_to_new_level / xp_new_level) * 100)
-
         embed.description = f"""
                 Прогрес до наступного рівню: `{self.xp}/{self.level_to_xp(self.level + 1)}`
-                > ```{self.level} {progress_bar(percent)} {self.level + 1}```
+                > ```{self.level} {progress_bar(self.l_tnl_percent)} {self.level + 1}```
                 """
 
         # Placeholder image to make embed have the same width everytime
@@ -202,11 +205,11 @@ class User(Model):
                 reward_value = await award.apply(self)
                 rewards += f'\n{get_formatted_reward_string(reward_value)}'
 
+            self.level = level
+            await self.save()
+
         else:
             affected = False
 
-        self.level = level
-        await self.save()
-
-        rewards = rewards if len(rewards) > 0 else None
+        rewards = rewards if rewards else None
         return level, affected, rewards

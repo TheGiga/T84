@@ -1,7 +1,6 @@
 import discord
 from discord.ext import tasks
 
-import config
 from src.bot import T84
 from src.models import User
 from src.achievements import Achievements, MsgCountAchievement
@@ -19,7 +18,7 @@ class Tracker(discord.Cog):
         if len(str(message.clean_content)) < 10:
             return
 
-        if message.channel.id != config.PARENT_GUILD_MAIN_CHAT:
+        if message.channel.id != self.bot.config.PARENT_GUILD_MAIN_CHAT:
             return
 
         cached_value = self.message_tracker_cache.get(message.author.id)

@@ -30,7 +30,7 @@ class AdminCommands(discord.Cog):
     ):
         user, _ = await User.get_or_create(discord_id=member.id)
 
-        await ctx.defer()
+        await ctx.defer(ephemeral=True)
 
         overall_applied_rewards = []
 

@@ -3,7 +3,6 @@ import random
 import uuid
 
 import discord
-import config
 from discord.ext import tasks
 
 from src import DefaultEmbed
@@ -28,7 +27,7 @@ class Events(discord.Cog):
         self.flag_endpoint = 'https://flagcdn.com/h240/{}.png'
         self.codes: dict = country_codes
 
-        self.channel_id = config.EVENT_CHANNEL_ID
+        self.channel_id = self.bot.config.EVENT_CHANNEL_ID
 
         self.random_flag_event.start()
 
@@ -47,7 +46,7 @@ class Events(discord.Cog):
 
         embed = DefaultEmbed()
         embed.title = "Що це за прапор?"
-        embed.description = f"За правильну відповідь - нагорода `{config.FLAG_EVENT_PRIZE} 💸`"
+        embed.description = f"За правильну відповідь - нагорода `{self.bot.config.FLAG_EVENT_PRIZE} 💸`"
         embed.set_image(url=self.flag_endpoint.format(pick))
 
         view = discord.ui.View()
@@ -91,11 +90,11 @@ class Events(discord.Cog):
         )
 
         user, _ = await User.get_or_create(discord_id=guess.user.id)
-        await user.add_balance(config.FLAG_EVENT_PRIZE)
+        await user.add_balance(self.bot.config.FLAG_EVENT_PRIZE)
 
         await guess.response.send_message(
             content=f'**Ви відповіли правильно!**\n'
-                    f'Нагорода `{config.FLAG_EVENT_PRIZE} 💸`',
+                    f'Нагорода `{self.bot.config.FLAG_EVENT_PRIZE} 💸`',
             ephemeral=True
         )
 

@@ -1,7 +1,6 @@
 import discord
 from typing import Union
 
-import config
 from src import DefaultEmbed
 from src.bot import T84
 from src.achievements import Achievement, Achievements as AchievementsEnum, MsgCountAchievement
@@ -84,7 +83,7 @@ class Achievements(discord.Cog):
         if not hasattr(user, "guild"):
             return
 
-        if user.guild.id != config.PARENT_GUILD:
+        if user.guild.id != self.bot.config.PARENT_GUILD:
             return
 
         if reaction.emoji == "🍉":

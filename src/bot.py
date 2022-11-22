@@ -1,7 +1,11 @@
 import logging
+from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
+import os
 from abc import ABC
 
+import aiohttp
 import discord
+from discord import Webhook
 from discord.ext.commands import MissingPermissions
 from discord.errors import CheckFailure
 
@@ -21,7 +25,16 @@ class T84(discord.Bot, ABC):
     def __init__(self, *args, **options):
         super().__init__(*args, **options)
 
-    # Should be re-written vvv
+        self.config = config
+
+        if bool(os.getenv("BOT_DEBUG")) is True:
+            logging.info("T84 Debug mode, aka testing.")
+
+            self.config.PARENT_GUILD = self.config.BACKEND_GUILD
+            self.config.PARENT_GUILD_MAIN_CHAT = self.config.BACKEND_CHAT
+            self.config.EVENT_CHANNEL_ID = self.config.BACKEND_CHAT
+
+    # TODO: Should be re-written vvv
     def help_command_embed(self) -> discord.Embed:
         embed = discord.Embed(colour=discord.Colour.embed_background(), timestamp=discord.utils.utcnow())
         embed.title = 'Допомога'
@@ -55,6 +68,29 @@ class T84(discord.Bot, ABC):
     async def on_ready(self):
         tprint("T84")
         print(f"Bot is ready, logged in as {self.user}")
+
+    @staticmethod
+    async def log(message: str, level: DEBUG | INFO | WARNING | ERROR | CRITICAL) -> None:
+        """
+        Message will be forwarded to local logging module and filesystem
+        and also sent out via discord webhook if needed.
+
+        :param level: level of log
+        :param message: The message to be logged
+        :return: None
+        """
+
+        logging.log(
+            level=level,
+            msg=message
+        )
+
+        if level >= INFO:
+            content = f'`[{logging.getLevelName(level)}]` {message}'
+
+            async with aiohttp.ClientSession() as session:
+                webhook = Webhook.from_url(os.getenv("LOGGING_WEBHOOK"), session=session)
+                await webhook.send(content=content)
 
     async def on_application_command_error(
             self, ctx: discord.ApplicationContext, error: discord.ApplicationCommandError
@@ -98,11 +134,11 @@ class T84(discord.Bot, ABC):
                     color=discord.Colour.embed_background(),
                 )
             )
-        except discord.NotFound:
+        except discord.HTTPException:
             pass
 
         # capture_exception(error)
-        logging.error(error)
+        await self.log(str(error), logging.ERROR)
         raise error
 
 
@@ -113,7 +149,7 @@ bot_instance = T84(intents=_intents)
 async def overall_check(ctx: discord.ApplicationContext):
     from src.models import Guild, User
 
-    if ctx.guild_id not in (config.PARENT_GUILD, config.TESTING_GUILD):
+    if ctx.guild_id not in (config.PARENT_GUILD, config.BACKEND_GUILD):
         await ctx.respond(
             content=f"❌ **Виконання цієї команди заборонено на зовнішніх серверах.**\n"
                     f"*Якщо ви переконані що це помилка - зв'яжіться з розробником `gigalegit-#0880`*\n\n"
@@ -126,5 +162,13 @@ async def overall_check(ctx: discord.ApplicationContext):
 
     # User creation if not present
     await User.get_or_create(discord_id=ctx.user.id)
+
+    checks = tuple(x.__name__ for x in ctx.command.checks)
+    if "admin_check" in checks:
+        await bot_instance.log(
+            f"ADMIN COMMAND </{ctx.command.qualified_name}:{ctx.command.qualified_id}> "
+            f"just used by {ctx.author} {ctx.author.mention}",
+            logging.WARNING
+        )
 
     return True

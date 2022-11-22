@@ -49,7 +49,7 @@ class Leveling(discord.Cog):
 
         user, _ = await User.get_or_create(discord_id=message.author.id)
 
-        xp = random.randint(9, 13)
+        xp = random.randint(*self.bot.config.LEVEL_MIN_MAX)
 
         await user.add_xp(xp)
 
@@ -57,8 +57,7 @@ class Leveling(discord.Cog):
 
         if affected:
 
-            desc = f"**Ви досягли нового рівню!**\n\nПропишіть </profile:1031212782437290054> щоб " \
-                f"подивится повну статистику свого профілю."
+            desc = f"Пропишіть </profile:1031212782437290054> щоб подивится повну статистику свого профілю."
 
             if rewards is not None:
                 desc += f"\n\n**Нагороди**: {rewards}"

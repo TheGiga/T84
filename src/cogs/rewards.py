@@ -8,8 +8,8 @@ class Rewards(discord.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @discord.slash_command(name='reward', description='🔮 Список нагород для вказаного рівню.')
-    async def reward(
+    @discord.slash_command(name='rewards', description='🔮 Список нагород для вказаного рівню.')
+    async def rewards(
             self, ctx: discord.ApplicationContext, level: discord.Option(int, description='Рівень')
     ):
         rewards: list[Reward] = leveled_rewards.get(level)

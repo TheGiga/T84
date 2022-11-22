@@ -1,11 +1,16 @@
 import os
-from datetime import datetime as dt
 from dotenv import load_dotenv
+
+import logging
+from datetime import datetime as dt
+
+fmt = '[%(levelname)s] %(asctime)s - %(message)s'
+file = f'logs/{dt.strftime(dt.now(), "[%b] %d.%m.%Y (%Hh%Mm%Ss)")}.log'
+logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
 
 load_dotenv()
 
 import config
-import logging
 
 # import sentry_sdk
 
@@ -26,10 +31,6 @@ from src.database import db_init
 
 
 def main():
-    fmt = '[%(levelname)s] %(asctime)s - %(message)s'
-    file = f'logs/{dt.strftime(dt.utcnow(), "[%b] %d.%m.%Y (%Hh%Mm%Ss)")}.log'
-    logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
-
     for cog in config.cogs:
         try:
             bot_instance.load_extension(cog)
