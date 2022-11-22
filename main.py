@@ -1,14 +1,15 @@
-import os
 from dotenv import load_dotenv
+load_dotenv()
+
+import os
+from datetime import datetime as dt
+from tortoise import run_async
 
 import logging
-from datetime import datetime as dt
 
 fmt = '[%(levelname)s] %(asctime)s - %(message)s'
 file = f'logs/{dt.strftime(dt.now(), "[%b] %d.%m.%Y (%Hh%Mm%Ss)")}.log'
 logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
-
-load_dotenv()
 
 import config
 
@@ -23,11 +24,16 @@ import config
 #    traces_sample_rate=1.0,
 # )
 
-from tortoise import run_async
 from discord import ExtensionNotFound
 from src import bot_instance
 
 from src.database import db_init
+
+
+def shutdown():
+    print('🛑 Shutting down...')
+    bot_instance.loop.stop()
+    print('☑ Done!')
 
 
 def main():
@@ -38,8 +44,13 @@ def main():
         except ExtensionNotFound:
             print(f'❌ Failed to load extension {cog}')
 
-    run_async(db_init())
-    bot_instance.run(os.getenv("TOKEN"))
+    try:
+        run_async(db_init())
+        bot_instance.run(os.getenv("TOKEN"))
+    except KeyboardInterrupt:
+        pass
+    finally:
+        exit(shutdown())
 
 
 if __name__ == "__main__":
