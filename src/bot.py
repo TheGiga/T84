@@ -142,29 +142,3 @@ class T84(discord.Bot, ABC):
 
 
 bot_instance = T84(intents=_intents)
-
-
-@bot_instance.check
-async def overall_check(ctx: discord.ApplicationContext):
-    from src.models import User
-
-    if ctx.guild_id not in (config.PARENT_GUILD, config.BACKEND_GUILD):
-        await ctx.respond(
-            content=f"❌ **Виконання цієї команди заборонено на зовнішніх серверах.**\n"
-                    f"*Якщо ви переконані що це помилка - зв'яжіться з розробником `gigalegit-#0880`*\n\n"
-                    f"Сервер бота -> {config.PG_INVITE}"
-        )
-        raise GuildNotWhitelisted(ctx.guild_id)
-
-    # User creation if not present
-    await User.get_or_create(discord_id=ctx.user.id)
-
-    checks = tuple(x.__name__ for x in ctx.command.checks)
-    if "admin_check" in checks:
-        await bot_instance.log(
-            f"ADMIN COMMAND </{ctx.command.qualified_name}:{ctx.command.qualified_id}> "
-            f"just used by {ctx.author} {ctx.author.mention}",
-            logging.WARNING
-        )
-
-    return True
