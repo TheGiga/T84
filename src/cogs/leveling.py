@@ -58,6 +58,7 @@ class Leveling(discord.Cog):
                 desc += f"\n\n**Нагороди**: {rewards}"
 
             embed = DefaultEmbed()
+            embed.title = "Ви досягли нового рівню!"
             embed.description = desc
 
             embed.add_field(name='⚖ Рівень', value=f"`{lvl}`")
