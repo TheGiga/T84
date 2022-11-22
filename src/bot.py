@@ -95,6 +95,8 @@ class T84(discord.Bot, ABC):
     async def on_application_command_error(
             self, ctx: discord.ApplicationContext, error: discord.ApplicationCommandError
     ):
+        await ctx.defer(ephemeral=True)
+
         if isinstance(error, GuildNotWhitelisted):
             return
 
@@ -126,16 +128,13 @@ class T84(discord.Bot, ABC):
                 ),
             )
 
-        try:
-            await ctx.respond(
-                embed=discord.Embed(
-                    title=error.__class__.__name__,
-                    description=str(error),
-                    color=discord.Colour.embed_background(),
-                )
+        await ctx.respond(
+            embed=discord.Embed(
+                title=error.__class__.__name__,
+                description=str(error),
+                color=discord.Colour.embed_background(),
             )
-        except discord.HTTPException:
-            pass
+        )
 
         # capture_exception(error)
         await self.log(str(error), logging.ERROR)
@@ -147,7 +146,7 @@ bot_instance = T84(intents=_intents)
 
 @bot_instance.check
 async def overall_check(ctx: discord.ApplicationContext):
-    from src.models import Guild, User
+    from src.models import User
 
     if ctx.guild_id not in (config.PARENT_GUILD, config.BACKEND_GUILD):
         await ctx.respond(
@@ -156,9 +155,6 @@ async def overall_check(ctx: discord.ApplicationContext):
                     f"Сервер бота -> {config.PG_INVITE}"
         )
         raise GuildNotWhitelisted(ctx.guild_id)
-
-    # Guild creation if not present | For future
-    await Guild.get_or_create(discord_id=ctx.guild_id)
 
     # User creation if not present
     await User.get_or_create(discord_id=ctx.user.id)

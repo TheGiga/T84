@@ -5,7 +5,7 @@ from discord.ext import tasks
 from tortoise.queryset import QuerySet
 
 from src.bot import T84
-from src.models import Guild, User
+from src.models import User
 from src import DefaultEmbed
 
 
@@ -40,11 +40,6 @@ class Leveling(discord.Cog):
             return
 
         if message.author.id in self.cache or message.author.bot:
-            return
-
-        db_guild = await Guild.get_or_none(discord_id=message.guild.id)
-
-        if db_guild is None:
             return
 
         user, _ = await User.get_or_create(discord_id=message.author.id)
