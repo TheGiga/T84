@@ -78,3 +78,4 @@ if __name__ == "__main__":
         if not bot_instance.is_closed():
             event_loop.run_until_complete(bot_instance.close())
         event_loop.run_until_complete(connections.close_all(discard=True))
+        event_loop.stop()

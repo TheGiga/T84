@@ -67,7 +67,7 @@ class T84(discord.Bot, ABC):
 
     async def on_ready(self):
         tprint("T84")
-        print(f"Bot is ready, logged in as {self.user}")
+        print(f"✔ Bot is ready, logged in as {self.user}")
 
     @staticmethod
     async def log(message: str, level: DEBUG | INFO | WARNING | ERROR | CRITICAL) -> None:

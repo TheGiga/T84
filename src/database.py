@@ -9,7 +9,7 @@ async def db_init():
         modules={'models': ['src.models.db']}
     )
 
-    print("☑ Database initialised!")
+    print("✔ Database initialised!")
     logging.info("Database initialised!")
 
     await Tortoise.generate_schemas(safe=True)

@@ -5,7 +5,7 @@ FROM python:3.10.7-slim-buster
 WORKDIR ./
 
 COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+RUN pip3 install -U -r requirements.txt
 
 COPY . .
 
