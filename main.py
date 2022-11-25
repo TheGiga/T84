@@ -2,10 +2,11 @@ import discord
 import os
 import logging
 # import sentry_sdk
+import asyncio
 from dotenv import load_dotenv
 from discord import ExtensionNotFound
 from datetime import datetime as dt
-from tortoise import run_async
+from tortoise import connections
 
 load_dotenv()
 
@@ -25,12 +26,6 @@ logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
 import config
 from src import bot_instance, GuildNotWhitelisted
 from src.database import db_init
-
-
-def shutdown():
-    print('🛑 Shutting down...')
-    bot_instance.loop.stop()
-    print('☑ Done!')
 
 
 @bot_instance.check
@@ -59,7 +54,7 @@ async def overall_check(ctx: discord.ApplicationContext):
     return True
 
 
-def main():
+async def main():
     for cog in config.cogs:
         try:
             bot_instance.load_extension(cog)
@@ -67,14 +62,19 @@ def main():
         except ExtensionNotFound:
             print(f'❌ Failed to load extension {cog}')
 
-    try:
-        run_async(db_init())
-        bot_instance.run(os.getenv("TOKEN"))
-    except KeyboardInterrupt:
-        pass
-    finally:
-        exit(shutdown())
+    await db_init()
+    await bot_instance.start(os.getenv("TOKEN"))
 
 
 if __name__ == "__main__":
-    main()
+    event_loop = asyncio.get_event_loop_policy().get_event_loop()
+
+    try:
+        event_loop.run_until_complete(main())
+    except KeyboardInterrupt:
+        pass
+    finally:
+        print("🛑 Shutting Down")
+        if not bot_instance.is_closed():
+            event_loop.run_until_complete(bot_instance.close())
+        event_loop.run_until_complete(connections.close_all(discard=True))
