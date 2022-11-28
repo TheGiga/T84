@@ -3,7 +3,7 @@
 *ℹ️ The name `T84` is based on line of Ukrainian Modern Battle Tanks.*
 
 ⚠️ Bot doesn't have any special abilities outside parent server, but you are free to take bits from it's code (reffer to this repo please, *if you can*)
-*if you find my code... well... somewhat maintnainable of course :D*
+*if you find my code... well... somewhat maintainable of course :D*
 
 # 🚀 This bot has following features:
 - Leveling & Rewards
