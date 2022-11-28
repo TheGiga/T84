@@ -27,7 +27,7 @@ class T84(discord.Bot, ABC):
 
         self.config = config
 
-        if bool(os.getenv("BOT_DEBUG")) is True:
+        if os.getenv("BOT_DEBUG") == "True":
             logging.info("T84 Debug mode, aka testing.")
 
             self.config.PARENT_GUILD = self.config.BACKEND_GUILD
@@ -95,8 +95,6 @@ class T84(discord.Bot, ABC):
     async def on_application_command_error(
             self, ctx: discord.ApplicationContext, error: discord.ApplicationCommandError
     ):
-        await ctx.defer(ephemeral=True)
-
         if isinstance(error, GuildNotWhitelisted):
             return
 
