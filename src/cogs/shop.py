@@ -1,6 +1,7 @@
 import discord
 
 from src import DefaultEmbed
+from src.base_types import Unique
 from src.bot import T84
 from src.models import User
 from src.shop import ShopItems, ShopItem
@@ -58,7 +59,7 @@ class Select(discord.ui.Select):
         cart_items_formatted = ""
 
         for item in self.values:
-            shop_item: ShopItem = ShopItems.get_from_id(int(item))
+            shop_item: ShopItem = Unique.get_from_id(int(item))
             cart.append(shop_item)
             cart_cost += shop_item.cost
             cart_items_formatted += f'• **{shop_item.label}** - {shop_item.cost} 💸\n'
