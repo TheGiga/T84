@@ -100,8 +100,6 @@ class T84(discord.Bot, ABC):
         if isinstance(error, GuildNotWhitelisted):
             return
 
-        await ctx.defer(ephemeral=True)
-
         if isinstance(error, MissingPermissions):
             embed = discord.Embed(colour=discord.Colour.red(), title='⚠ Заборонено!')
             embed.description = f"❌ Вам не дозволено виконання цієї команди!"

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import TypeVar, Type
+from typing import TypeVar
 
 from src.base_types import Unique, Inventoriable
 from src.models import User
@@ -64,17 +64,3 @@ class ShopItems(Enum):
         3003, "Пиво \"Легенда Донбасу\"", 2999, "🍺", ItemValue("roles", 1043201573762908270),
         description="Те саме, ЛЕГЕНДАРНЕ пиво - тепер може стати украсою вашого профілю!"
     )
-
-    @classmethod
-    def get_from_id(cls: Type[T], identifier: int) -> T | None:
-        for name, value in cls.__dict__.items():
-            try:
-                if name.startswith("_"):
-                    continue
-
-                if value.value.identifier == identifier:
-                    return value.value
-            except AttributeError:
-                continue
-
-        return None
