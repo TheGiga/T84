@@ -35,7 +35,7 @@ class Events(discord.Cog):
     async def random_flag_event(self):
         await self.bot.wait_until_ready()
 
-        channel = await self.bot.fetch_channel(self.channel_id)
+        channel = await discord.utils.get_or_fetch(self.bot, 'channel', self.bot.config.EVENT_CHANNEL_ID)
 
         picks: list = random.sample(
             list(self.codes.keys()), k=4

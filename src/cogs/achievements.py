@@ -32,15 +32,15 @@ class Achievements(discord.Cog):
         other_achievements = ""
 
         for ach in user.achievements:
-            ach_object = AchievementsEnum.get_from_id(ach)
+            ach_object = Achievement.get_from_id(ach)
             if type(ach_object) is MsgCountAchievement:
                 msg_achievement = ach_object
 
             else:
-                other_achievements += f"☑️ {ach_object.text} `({ach_object.identifier})`\n"
+                other_achievements += f"☑️ {ach_object.name} `({ach_object.fake_id})`\n"
 
         if msg_achievement is not None:
-            embed.add_field(name=f'{msg_achievement.text}', value=f'{msg_achievement.long_text}')
+            embed.add_field(name=f'{msg_achievement.name}', value=f'{msg_achievement.description}')
 
         embed.description = f"""
         Кількість досягнень: `{len(user.achievements)}/{len(AchievementsEnum)}`
@@ -55,26 +55,35 @@ class Achievements(discord.Cog):
     @discord.slash_command(name='achievement', description='⭐ Подивитися інформацію про досягнення.')
     async def achievement(
             self, ctx: discord.ApplicationContext, identifier: discord.Option(
-                int, name='id', description="Номер досягнення. Усі досягнення пронумеровані по порядку."
+                int, name='id', description="Номер досягнення. Усі досягнення пронумеровані по порядку.",
+                min_value=1, max_value=len(AchievementsEnum)
             )
     ):
-        achievement: Union[Achievement, None] = AchievementsEnum.get_from_id(identifier)
+        # +2000 because I use fake achievement ID's on frontend, so people can easily manage them.
+        # 1, 2, 3 is better than 2001, 2002, 2003... right?
+        achievement: Union[Achievement, None] = Achievement.get_from_id(identifier+2000)
 
         if achievement is None:
             return await ctx.respond(content="❌ Досягнення з таким номером не знайдено!", ephemeral=True)
 
+        if achievement is Achievement.get_from_id(2011):
+            user = await User.get(discord_id=ctx.author.id)
+            await user.add_achievement(2011, notify_user=True)
+
         if achievement.secret:
             embed = DefaultEmbed()
-            embed.title = f"{achievement.text}"
+            embed.title = "???"
             embed.description = "*Це досягнення засекречене!*"
+            embed.colour = discord.Colour.red()
 
             return await ctx.respond(embed=embed)
 
         embed = DefaultEmbed()
         embed.colour = discord.Colour.blurple()
 
-        embed.title = achievement.text
-        embed.description = achievement.long_text
+        embed.title = achievement.name
+
+        embed.description = achievement.description
 
         await ctx.respond(embed=embed)
 
@@ -88,7 +97,11 @@ class Achievements(discord.Cog):
 
         if reaction.emoji == "🍉":
             user, _ = await User.get_or_create(discord_id=user.id)
-            await user.add_achievement(AchievementsEnum.get_from_id(9), notify_user=True)
+            await user.add_achievement(Achievement.get_from_id(2009), notify_user=True)
+
+        elif reaction.emoji == "💣":
+            user, _ = await User.get_or_create(discord_id=user.id)
+            await user.add_achievement(Achievement.get_from_id(2014), notify_user=True)
 
 
 def setup(bot: T84):

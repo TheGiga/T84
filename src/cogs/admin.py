@@ -2,12 +2,12 @@ import discord
 import config
 from discord.ext import commands
 
-from src.achievements import Achievements
+from src.achievements import Achievements, Achievement
 from src.bot import T84
 from src.models import User
 from src.rewards import leveled_rewards
 
-achievements = [x.value.identifier for x in Achievements]
+achievements = [x.value.uid for x in Achievements]
 
 
 def admin_check(ctx: discord.ApplicationContext):
@@ -72,7 +72,7 @@ class AdminCommands(discord.Cog):
     ):
         user = await User.get(discord_id=member.id)
 
-        await user.add_achievement(Achievements.get_from_id(achievement), notify_user=notify_user)
+        await user.add_achievement(Achievement.get_from_id(achievement), notify_user=notify_user)
 
         await ctx.respond("☑ Успішно", ephemeral=True)
 

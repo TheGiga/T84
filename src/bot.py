@@ -26,8 +26,10 @@ class T84(discord.Bot, ABC):
         super().__init__(*args, **options)
 
         self.config = config
+        self.debug = False
 
         if os.getenv("BOT_DEBUG") == "True":
+            self.debug = True
             logging.info("T84 Debug mode, aka testing.")
 
             self.config.PARENT_GUILD = self.config.BACKEND_GUILD

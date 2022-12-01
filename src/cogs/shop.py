@@ -40,7 +40,7 @@ class Select(discord.ui.Select):
     def __init__(self, shop_items: tuple):
         options = [
             discord.SelectOption(
-                emoji=x.value.emoji, label=x.value.label, value=str(x.value.identifier)
+                emoji=x.value.emoji, label=x.value.label, value=str(x.value.uid)
             ) for x in shop_items
         ]
 
@@ -108,7 +108,7 @@ class Shop(discord.Cog):
         desc = ""
 
         for item in shop_items:
-            desc += f"{item.value.value.payload_label if shop_type == 'roles' else item.value.label}" \
+            desc += f"{f'<@&{item.value.value.payload}>' if shop_type == 'roles' else item.value.name}" \
                     f"\n*`- {item.value.description if item.value.description is not None else '(Без опису)'}`*" \
                     f"\n• {item.value.cost} 💸\n\n" \
 

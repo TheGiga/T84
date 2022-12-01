@@ -1,27 +1,35 @@
 from enum import Enum
 from typing import TypeVar, Type
 
+from src.base_types import Unique, Inventoriable
 from src.models import User
 
 T = TypeVar("T", bound="ShopItem")
 
 
 class ItemValue:
-    def __init__(self, code: str, payload, payload_label: str):
+    def __init__(self, code: str, payload):
         self.code = code
         self.payload = payload
-        self.payload_label = payload_label
 
 
-class ShopItem:
-    def __init__(self, identifier: int, label: str, cost: int, emoji: str, value: ItemValue, description: str = None):
-        self.identifier = identifier
+class ShopItem(Unique, Inventoriable):
+    def __init__(self, uid: int, label: str, cost: int, emoji: str, value: ItemValue, description: str = None):
         self.label = label
         self.cost = cost
-        self.value = value
-        self.emoji = emoji
 
+        self.value: ItemValue = value
+
+        self.emoji = emoji
         self.description = description
+
+        super().__init__(uid, self)
+
+    def __str__(self):
+        return f'🔻 {self.label}'
+
+    def __repr__(self):
+        return self.__str__
 
     async def give(self, user: User) -> ItemValue:
         """
@@ -45,21 +53,16 @@ class ShopItem:
 
 class ShopItems(Enum):
     ROLE_PIZZA = ShopItem(
-        1, "Pizza", 1499, "🍕", ItemValue(
-            "roles", 1041868323710840873, "<@&1041868323710840873>"
-        )
+        3001, "Pizza", 1499, "🍕", ItemValue("roles", 1041868323710840873)
     )
 
     ROLE_BURGER = ShopItem(
-        2, "Burger", 1999, "🍔", ItemValue(
-            "roles", 1042198043992281118, "<@&1042198043992281118>"
-        )
+        3002, "Burger", 1999, "🍔", ItemValue("roles", 1042198043992281118)
     )
 
     ROLE_LEGEND_OF_BOMBASS = ShopItem(
-        3, "Пиво \"Легенда Донбасу\"", 2999, "🍺", ItemValue(
-            "roles", 1043201573762908270, "<@&1043201573762908270>"
-        ), description="Те саме, ЛЕГЕНДАРНЕ пиво - тепер може стати украсою вашого профілю!"
+        3003, "Пиво \"Легенда Донбасу\"", 2999, "🍺", ItemValue("roles", 1043201573762908270),
+        description="Те саме, ЛЕГЕНДАРНЕ пиво - тепер може стати украсою вашого профілю!"
     )
 
     @classmethod

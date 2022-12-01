@@ -26,6 +26,8 @@ class Profile(discord.Cog):
     async def balance(self, ctx: discord.ApplicationContext):
         user = await User.get(discord_id=ctx.author.id)
 
+        await user.add_achievement(2013, notify_user=True)
+
         await ctx.respond(f"Ваш баланс: **{user.balance}** 💸", ephemeral=True)
 
 

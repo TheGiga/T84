@@ -7,7 +7,8 @@ from tortoise import fields
 from tortoise.models import Model
 
 import config
-from src import bot_instance, DefaultEmbed
+from src import bot_instance, DefaultEmbed, UniqueItemNotFound
+from src.base_types import Unique, Inventoriable
 from src.utils import progress_bar
 
 
@@ -18,7 +19,9 @@ class User(Model):
     level = fields.IntField(default=0)
     message_count = fields.IntField(default=0)
     balance = fields.IntField(default=0)
+
     achievements = fields.JSONField(default=[])
+    inventory = fields.JSONField(default=[])
 
     def __int__(self):
         return self.discord_id
@@ -69,6 +72,30 @@ class User(Model):
             logging.info(f"Couldn't send message to {discord_instance.id}, most likely due to closed DM's.")
             pass
 
+    async def add_inventory_item(self, item_id: int):
+        """
+        Note: Item should be an instance of src.base_types.Inventoriable
+
+        :param item_id: The Unique (src.base_types.Unique) ID of an item.
+        :return:
+        """
+        inventory = list(self.achievements)
+
+        if item_id in inventory:
+            return
+
+        obj = Unique.get_from_id(item_id)
+
+        if obj is None:
+            raise UniqueItemNotFound(item_id)
+
+        if not isinstance(obj, Inventoriable):
+            return
+
+        inventory.append(item_id)
+        self.inventory = inventory
+        await self.save()
+
     async def add_balance(self, amount: int, notify_user: bool = False) -> None:
         self.balance += amount
         await self.save()
@@ -85,11 +112,15 @@ class User(Model):
     async def add_achievement(
             self, achievement, notify_user: bool = False
     ) -> None:
+        if type(achievement) is int:
+            from src.achievements import Achievement
+            achievement: Achievement = Achievement.get_from_id(achievement)
+
         current_achievements = list(self.achievements)
-        if achievement.identifier in current_achievements:
+        if achievement.uid in current_achievements:
             return
 
-        current_achievements.append(achievement.identifier)
+        current_achievements.append(achievement.uid)
         self.achievements = current_achievements
         await self.save()
 
@@ -97,11 +128,11 @@ class User(Model):
             embed = DefaultEmbed()
 
             embed.set_author(name='ДТВУ | Досягнення', url=config.PG_INVITE)
-            embed.title = f'🔵 {achievement.text}'
-            embed.description = f'{achievement.long_text}'
+            embed.title = f'🔹 {achievement.name}'
+            embed.description = f'{achievement.description}'
             embed.colour = discord.Colour.blurple()
 
-            embed.set_footer(text=f'Код досягнення: {achievement.identifier}')
+            embed.set_footer(text=f'Код досягнення: {achievement.fake_id}')
 
             await self.send_embed(embed)
 

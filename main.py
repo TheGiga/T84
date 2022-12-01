@@ -1,3 +1,5 @@
+import json
+
 import discord
 import os
 import logging
@@ -7,11 +9,10 @@ from dotenv import load_dotenv
 from discord import ExtensionNotFound
 from datetime import datetime as dt
 from tortoise import connections
-
 load_dotenv()
 
 fmt = '[%(levelname)s] %(asctime)s - %(message)s'
-file = f'logs/{dt.strftime(dt.now(), "[%b] %d.%m.%Y (%Hh%Mm%Ss)")}.log'
+file = f'logs/{dt.strftime(dt.now(), "[%b] %Y.%m.%d (%Hh%Mm%Ss)")}.log'
 logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
 
 # sentry_debug = True if os.getenv("SENTRY_DEBUG") == "True" else False
@@ -26,6 +27,7 @@ logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
 import config
 from src import bot_instance, GuildNotWhitelisted
 from src.database import db_init
+from src.base_types import Unique
 
 
 @bot_instance.check
@@ -61,6 +63,12 @@ async def main():
             print(f'✅ Extension {cog} successfully loaded!')
         except ExtensionNotFound:
             print(f'❌ Failed to load extension {cog}')
+
+    unique_instances = json.dumps(dict(Unique.__instances__), indent=4, default=str, ensure_ascii=False, sort_keys=True)
+    logging.info(f"Unique instances processed: {unique_instances}")
+
+    if bot_instance.debug:
+        print(f'✔ Processed Unique instances: {unique_instances}')
 
     await db_init()
     await bot_instance.start(os.getenv("TOKEN"))
