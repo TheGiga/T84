@@ -100,6 +100,8 @@ class T84(discord.Bot, ABC):
         if isinstance(error, GuildNotWhitelisted):
             return
 
+        await ctx.defer(ephemeral=True)
+
         if isinstance(error, MissingPermissions):
             embed = discord.Embed(colour=discord.Colour.red(), title='⚠ Заборонено!')
             embed.description = f"❌ Вам не дозволено виконання цієї команди!"
@@ -113,7 +115,7 @@ class T84(discord.Bot, ABC):
             return
 
         if isinstance(error, discord.ApplicationCommandInvokeError):
-            await ctx.send(
+            await ctx.respond(
                 "Сталася невідома помилка, я доповів про цей кейс розробнику.\n\n"
                 "Якщо це буде повторюватись - напишіть розробнику: `gigalegit-#0880`\n"
                 "Якщо вам щось терміново потрібно - приєднуйтесь до серверу бота. *(кнопка нижче)*",
@@ -126,9 +128,10 @@ class T84(discord.Bot, ABC):
                         url="https://github.com/TheGiga/T84",
                     ),
                 ),
+                ephemeral=False
             )
 
-        await ctx.respond(
+        await ctx.send(
             embed=discord.Embed(
                 title=error.__class__.__name__,
                 description=str(error),
