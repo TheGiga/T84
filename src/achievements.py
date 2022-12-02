@@ -17,7 +17,7 @@ class Achievement(Unique):
         return f'🔹 {self.name}'
 
     def __repr__(self):
-        return self.__str__
+        return self.__str__()
 
     @property
     def fake_id(self):

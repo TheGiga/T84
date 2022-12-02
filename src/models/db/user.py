@@ -213,7 +213,7 @@ class User(Model):
         level_gain = level - self.level
 
         affected = True
-        rewards = ""
+        rewards_string = ""
 
         if level_gain > 0:
             from src.rewards import Reward, get_formatted_reward_string
@@ -223,18 +223,18 @@ class User(Model):
 
             if member_instance is None:
                 # User left the guild or something happened.
-                return level, False, rewards
+                return level, False, rewards_string or None
 
-            awards: list[Reward] = []
+            rewards: list[Reward] = []
 
             for i in range(self.level, level):
                 ext = leveled_rewards.get(i + 1)
 
-                awards.extend(ext if ext is not None else [])
+                rewards.extend(ext if ext is not None else [])
 
-            for award in awards:
-                reward_value = await award.apply(self)
-                rewards += f'\n{get_formatted_reward_string(reward_value)}'
+            for reward in rewards:
+                reward_value = await reward.apply(self)
+                rewards_string += f'\n{get_formatted_reward_string(reward_value)}'
 
             self.level = level
             await self.save()
@@ -242,5 +242,4 @@ class User(Model):
         else:
             affected = False
 
-        rewards = rewards if rewards else None
-        return level, affected, rewards
+        return level, affected, rewards_string or None

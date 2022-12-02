@@ -29,7 +29,7 @@ class ShopItem(Unique, Inventoriable):
         return f'🔻 {self.label}'
 
     def __repr__(self):
-        return self.__str__
+        return self.__str__()
 
     async def give(self, user: User) -> ItemValue:
         """

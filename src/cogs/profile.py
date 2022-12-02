@@ -13,8 +13,7 @@ class Profile(discord.Cog):
             self, ctx: discord.ApplicationContext,
             member: discord.Option(discord.Member, description="👤 Юзер") = None
     ):
-        if member is None:
-            member = ctx.author
+        member = member or ctx.author
 
         user, _ = await User.get_or_create(discord_id=member.id)
 

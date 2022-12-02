@@ -16,8 +16,7 @@ class Achievements(discord.Cog):
             self, ctx: discord.ApplicationContext,
             discord_instance: discord.Option(discord.Member, name='member', description="Користувач.") = None
     ):
-        if discord_instance is None:
-            discord_instance = ctx.author
+        discord_instance = discord_instance or ctx.author
 
         await ctx.defer()
 
