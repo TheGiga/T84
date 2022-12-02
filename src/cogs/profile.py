@@ -30,15 +30,21 @@ class Profile(discord.Cog):
         await ctx.respond(f"Ваш баланс: **{ctx.user_instance.balance}** 💸", ephemeral=True)
 
     @discord.slash_command(name='inventory', description='👤 Переглянути свій інвентар.')
-    async def inventory(self, ctx: T84ApplicationContext):
+    async def inventory(
+            self, ctx: T84ApplicationContext, member: discord.Option(discord.Member, description="👤 Користувач") = None
+    ):
+        member = member or ctx.author
+
+        user_instance, _ = await User.get_or_create(discord_id=member.id)
+
         embed = DefaultEmbed()
-        embed.title = f"Інвентар користувача {ctx.author.display_name}"
+        embed.title = f"Інвентар користувача {member.display_name}"
 
         desc = ""
         for item in ctx.user_instance.inventory:
-            desc += f"**{item}**\n*`- {item.description}`*\n\n"
+            desc += f"**{item}**\n*`- {item.description if item.description else '(Без опису)'}`*\n\n"
 
-        embed.description = desc
+        embed.description = desc if desc else "*Пусто* 😢"
 
         await ctx.respond(embed=embed)
 
