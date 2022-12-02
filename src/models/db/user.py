@@ -7,7 +7,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 import config
-from src import bot_instance, DefaultEmbed, UniqueItemNotFound
+from src import bot_instance, DefaultEmbed
 from src.base_types import Unique, Inventoriable
 from src.utils import progress_bar
 
@@ -72,27 +72,23 @@ class User(Model):
             logging.info(f"Couldn't send message to {discord_instance.id}, most likely due to closed DM's.")
             pass
 
-    async def add_inventory_item(self, item_id: int):
+    async def add_inventory_item(self, item: Unique) -> None:
         """
         Note: Item should be an instance of src.base_types.Inventoriable
 
-        :param item_id: The Unique (src.base_types.Unique) ID of an item.
-        :return:
+        :param item: Unique (src.base_types.Unique) item
+        :return: None
         """
-        inventory = list(self.achievements)
+        inventory = list(self.inventory)
 
-        if item_id in inventory:
+        if item.uid in inventory:
             return
 
-        obj = Unique.get_from_id(item_id)
-
-        if obj is None:
-            raise UniqueItemNotFound(item_id)
-
-        if not isinstance(obj, Inventoriable):
+        if not issubclass(item.__class__, Inventoriable):
+            print('not subclass')
             return
 
-        inventory.append(item_id)
+        inventory.append(item.uid)
         self.inventory = inventory
         await self.save()
 
@@ -144,7 +140,7 @@ class User(Model):
             embed = DefaultEmbed()
 
             embed.set_author(name='ДТВУ', url=config.PG_INVITE)
-            embed.description = f"Вам нараховано 🎈 **XP** у розмірі `{amount}`"
+            embed.description = f"Вам нараховано ⚗ **XP** у розмірі `{amount}`"
             embed.colour = discord.Colour.green()
 
             await self.send_embed(embed)
@@ -200,11 +196,11 @@ class User(Model):
         """
         Update user levels based on XP.
 
-        level - current level of user
+        level - user's level after function execution
 
         affected - if level was changed - this parameter will be True
 
-        reward - the thing user achieved with new level
+        rewards - the thing user achieved with new level
         
         :return: (level: int, affected: bool, rewards: str | None)
         """

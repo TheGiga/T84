@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from discord import ExtensionNotFound
 from datetime import datetime as dt
 from tortoise import connections
+
 load_dotenv()
 
 fmt = '[%(levelname)s] %(asctime)s - %(message)s'
@@ -25,15 +26,14 @@ logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
 # )
 
 import config
-from src import bot_instance, GuildNotWhitelisted
+from src import process_unique_instances, bot_instance, GuildNotWhitelisted
+from src.models import User
 from src.database import db_init
 from src.base_types import Unique
 
 
 @bot_instance.check
 async def overall_check(ctx: discord.ApplicationContext):
-    from src.models import User
-
     if ctx.guild_id not in (config.PARENT_GUILD, config.BACKEND_GUILD):
         await ctx.respond(
             content=f"❌ **Виконання цієї команди заборонено на зовнішніх серверах.**\n"
@@ -57,6 +57,8 @@ async def overall_check(ctx: discord.ApplicationContext):
 
 
 async def main():
+    process_unique_instances()
+
     for cog in config.cogs:
         try:
             bot_instance.load_extension(cog)

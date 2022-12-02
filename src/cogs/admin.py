@@ -3,11 +3,13 @@ import config
 from discord.ext import commands
 
 from src.achievements import Achievements, Achievement
+from src.base_types import Unique, Inventoriable
 from src.bot import T84
 from src.models import User
 from src.rewards import leveled_rewards
 
 achievements = [x.value.uid for x in Achievements]
+inventoriable_items = [x.uid for x in Unique.__instances__.values() if issubclass(x.__class__, Inventoriable)]
 
 
 def admin_check(ctx: discord.ApplicationContext):
@@ -21,6 +23,21 @@ class AdminCommands(discord.Cog):
     admin = discord.SlashCommandGroup('admin', "🛑 Адміністративні команди.")
     add = admin.create_subgroup('add', "➕")
     recalculate = admin.create_subgroup("recalculate", "♻")
+
+    @add.command(name='inventory_item')
+    async def adm_add_inventory_item(
+            self, ctx: discord.ApplicationContext,
+            item_id: discord.Option(int, name='item', choices=inventoriable_items),
+            member: discord.Option(discord.Member) = None
+    ):
+        member = member or ctx.author
+        user, _ = await User.get_or_create(discord_id=member.id)
+
+        item = Unique.get_from_id(item_id)
+
+        await user.add_inventory_item(item)
+
+        await ctx.respond("☑ Успішно.", ephemeral=True)
 
     @recalculate.command(name='rewards', description='♻')
     @commands.check(admin_check)

@@ -46,6 +46,8 @@ class ShopItem(Unique, Inventoriable):
                 if role is not None:
                     await discord_instance.add_roles(role, reason=f"Нагорода за рівень.")
 
+                await user.add_inventory_item(self)
+
                 return self.value
 
         # TODO: Add other items

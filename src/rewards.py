@@ -11,6 +11,16 @@ class RewardValue:
         self.payload = payload
 
 
+def get_formatted_reward_string(value: RewardValue) -> str:
+    match value.code:
+        case "role":
+            return f"`Звання` | 🔻 <@&{value.payload}>"
+        case "balance":
+            return f'`Валюта` | 🔸 {value.payload} 💸'
+        case "achievement":
+            return f'`Ачівка` | {str(Unique.get_from_id(value.payload))}'
+
+
 class Reward(Unique):
     def __init__(self, uid: int, value: RewardValue):
         self.value: RewardValue = value
@@ -104,13 +114,3 @@ leveled_rewards = {  # Leveled
         Reward(9035, RewardValue("achievement", 2010))
     ]
 }
-
-
-def get_formatted_reward_string(value: RewardValue) -> str:
-    match value.code:
-        case "role":
-            return f"`Звання` | 🔻 <@&{value.payload}>"
-        case "balance":
-            return f'`Валюта` | 🔸 {value.payload} 💸'
-        case "achievement":
-            return f'`Ачівка` | {str(Unique.get_from_id(value.payload))}'
