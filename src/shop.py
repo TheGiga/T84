@@ -23,7 +23,8 @@ class ShopItem(Unique, Inventoriable):
         self.emoji = emoji
         self.description = description
 
-        super().__init__(uid, self)
+        Unique.__init__(self, uid, self)
+        Inventoriable.__init__(self, self.__str__(), self.description)
 
     def __str__(self):
         return f'🔻 {self.label}'

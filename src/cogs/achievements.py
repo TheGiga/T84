@@ -2,7 +2,7 @@ import discord
 from typing import Union
 
 from src import DefaultEmbed
-from src.bot import T84
+from src.bot import T84, T84ApplicationContext
 from src.achievements import Achievement, Achievements as AchievementsEnum, MsgCountAchievement
 from src.models import User
 
@@ -13,7 +13,7 @@ class Achievements(discord.Cog):
 
     @discord.slash_command(name='achievements', description='⭐ Подивитися інформацію про досягнення користувача.')
     async def achievements(
-            self, ctx: discord.ApplicationContext,
+            self, ctx: T84ApplicationContext,
             discord_instance: discord.Option(discord.Member, name='member', description="Користувач.") = None
     ):
         discord_instance = discord_instance or ctx.author
@@ -30,7 +30,7 @@ class Achievements(discord.Cog):
 
         other_achievements = ""
 
-        for ach in user.achievements:
+        for ach in user._achievements:
             ach_object = Achievement.get_from_id(ach)
             if type(ach_object) is MsgCountAchievement:
                 msg_achievement = ach_object
@@ -42,7 +42,7 @@ class Achievements(discord.Cog):
             embed.add_field(name=f'{msg_achievement.name}', value=f'{msg_achievement.description}')
 
         embed.description = f"""
-        Кількість досягнень: `{len(user.achievements)}/{len(AchievementsEnum)}`
+        Кількість досягнень: `{len(user._achievements)}/{len(AchievementsEnum)}`
         
         {other_achievements}
         ──────────────────────────
@@ -53,7 +53,7 @@ class Achievements(discord.Cog):
 
     @discord.slash_command(name='achievement', description='⭐ Подивитися інформацію про досягнення.')
     async def achievement(
-            self, ctx: discord.ApplicationContext, identifier: discord.Option(
+            self, ctx: T84ApplicationContext, identifier: discord.Option(
                 int, name='id', description="Номер досягнення. Усі досягнення пронумеровані по порядку.",
                 min_value=1, max_value=len(AchievementsEnum)
             )
@@ -67,7 +67,7 @@ class Achievements(discord.Cog):
 
         if achievement is Achievement.get_from_id(2011):
             user = await User.get(discord_id=ctx.author.id)
-            await user.add_achievement(2011, notify_user=True)
+            await user.add_achievement(achievement, notify_user=True)
 
         if achievement.secret:
             embed = DefaultEmbed()

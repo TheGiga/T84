@@ -11,6 +11,11 @@ from src import bot_instance, DefaultEmbed
 from src.base_types import Unique, Inventoriable
 from src.utils import progress_bar
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.achievements import Achievement
+
 
 class User(Model):
     id = fields.IntField(pk=True)
@@ -20,8 +25,8 @@ class User(Model):
     message_count = fields.IntField(default=0)
     balance = fields.IntField(default=0)
 
-    achievements = fields.JSONField(default=[])
-    inventory = fields.JSONField(default=[])
+    _achievements = fields.JSONField(source_field="achievements", default=[])
+    _inventory = fields.JSONField(source_field="inventory", default=[])
 
     def __int__(self):
         return self.discord_id
@@ -44,6 +49,13 @@ class User(Model):
         lvl_raw = config.XP_MULTIPLIER * sqrt(xp)
 
         return floor(lvl_raw)
+
+    @property
+    def inventory(self) -> list[Inventoriable]:
+        return [
+            Unique.get_from_id(item_id)
+            for item_id in self._inventory
+        ]
 
     @property
     def xp_tnl(self) -> int:
@@ -79,17 +91,16 @@ class User(Model):
         :param item: Unique (src.base_types.Unique) item
         :return: None
         """
-        inventory = list(self.inventory)
+        inventory = list(self._inventory)
 
         if item.uid in inventory:
             return
 
         if not issubclass(item.__class__, Inventoriable):
-            print('not subclass')
             return
 
         inventory.append(item.uid)
-        self.inventory = inventory
+        self._inventory = inventory
         await self.save()
 
     async def add_balance(self, amount: int, notify_user: bool = False) -> None:
@@ -106,18 +117,14 @@ class User(Model):
             await self.send_embed(embed)
 
     async def add_achievement(
-            self, achievement, notify_user: bool = False
+            self, achievement: 'Achievement', notify_user: bool = False
     ) -> None:
-        if type(achievement) is int:
-            from src.achievements import Achievement
-            achievement: Achievement = Achievement.get_from_id(achievement)
-
-        current_achievements = list(self.achievements)
+        current_achievements = list(self._achievements)
         if achievement.uid in current_achievements:
             return
 
         current_achievements.append(achievement.uid)
-        self.achievements = current_achievements
+        self._achievements = current_achievements
         await self.save()
 
         if notify_user:
@@ -161,7 +168,7 @@ class User(Model):
         embed.add_field(name='⚗ Досвід', value=f'`{self.xp}`')
         embed.add_field(name='🏦 Баланс', value=f'`{self.balance}`')
         embed.add_field(name='🐦 Повідомлення', value=f'`{self.message_count}`')
-        embed.add_field(name='⭐ Досягнення', value=f'`{len(self.achievements)}/{len(Achievements)}`')
+        embed.add_field(name='⭐ Досягнення', value=f'`{len(self._achievements)}/{len(Achievements)}`')
         embed.add_field(name='🔢 UID', value=f'`#{self.id}`')
 
         embed.set_thumbnail(url=member.display_avatar.url)

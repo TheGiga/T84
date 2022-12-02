@@ -1,6 +1,6 @@
 from typing import Any
 
-from src.errors import UniqueIdAlreadyTaken
+from src import UniqueIdAlreadyTaken
 
 
 class Unique:
@@ -25,4 +25,6 @@ class Unique:
 # Basically flags, but I was too lazy to make them somewhat special.
 
 class Inventoriable:
-    pass
+    def __init__(self, name: str, description: str):
+        self.name = name
+        self.description = description

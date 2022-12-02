@@ -1,6 +1,4 @@
 import json
-
-import discord
 import os
 import logging
 # import sentry_sdk
@@ -26,14 +24,14 @@ logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
 # )
 
 import config
-from src import process_unique_instances, bot_instance, GuildNotWhitelisted
+from src import process_unique_instances, bot_instance, GuildNotWhitelisted, T84ApplicationContext
 from src.models import User
 from src.database import db_init
 from src.base_types import Unique
 
 
 @bot_instance.check
-async def overall_check(ctx: discord.ApplicationContext):
+async def overall_check(ctx: T84ApplicationContext):
     if ctx.guild_id not in (config.PARENT_GUILD, config.BACKEND_GUILD):
         await ctx.respond(
             content=f"❌ **Виконання цієї команди заборонено на зовнішніх серверах.**\n"
@@ -43,11 +41,13 @@ async def overall_check(ctx: discord.ApplicationContext):
         raise GuildNotWhitelisted(ctx.guild_id)
 
     # User creation if not present
-    await User.get_or_create(discord_id=ctx.user.id)
+    user, _ = await User.get_or_create(discord_id=ctx.user.id)
+
+    ctx._user_instance = user
 
     checks = tuple(x.__name__ for x in ctx.command.checks)
     if "admin_check" in checks:
-        await bot_instance.log(
+        await bot_instance.send_critical_log(
             f"ADMIN COMMAND </{ctx.command.qualified_name}:{ctx.command.qualified_id}> "
             f"just used by {ctx.author} {ctx.author.mention}",
             logging.WARNING
@@ -57,6 +57,7 @@ async def overall_check(ctx: discord.ApplicationContext):
 
 
 async def main():
+    print("🔃 Processing unique instances...")
     process_unique_instances()
 
     for cog in config.cogs:

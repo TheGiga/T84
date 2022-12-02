@@ -2,7 +2,7 @@ import discord
 
 from src import DefaultEmbed
 from src.base_types import Unique
-from src.bot import T84
+from src.bot import T84, T84ApplicationContext
 from src.models import User
 from src.shop import ShopItems, ShopItem
 from src.static import assets
@@ -97,7 +97,7 @@ class Shop(discord.Cog):
 
     @discord.slash_command(name='shop', description='🏬 Магазин серверу.')
     async def shop(
-            self, ctx: discord.ApplicationContext, shop_type: discord.Option(name="category", choices=['roles'])
+            self, ctx: T84ApplicationContext, shop_type: discord.Option(name="category", choices=['roles'])
     ):
         await ctx.defer()
 

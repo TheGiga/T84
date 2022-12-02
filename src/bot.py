@@ -2,15 +2,20 @@ import logging
 import os
 import aiohttp
 import discord
-from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
+from logging import WARNING, ERROR, CRITICAL
 from abc import ABC
 from art import tprint
-from discord import Webhook
+from discord import Webhook, Interaction
 from discord.ext.commands import MissingPermissions
 from discord.errors import CheckFailure
 
 import config
 from .errors import GuildNotWhitelisted
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .models import User
 
 # from sentry_sdk import capture_exception
 
@@ -18,6 +23,19 @@ _intents = discord.Intents.default()
 _intents.__setattr__("messages", True)
 _intents.__setattr__("message_content", True)
 _intents.__setattr__("members", True)
+
+
+class T84ApplicationContext(discord.ApplicationContext):
+    def __init__(self, bot: 'T84', interaction: Interaction):
+        super().__init__(bot, interaction)
+        self._user_instance = None
+
+    @property
+    def user_instance(self) -> 'User':
+        """
+        :return: User instance set during overall_check (main.py), instance of src.models.User
+        """
+        return self._user_instance
 
 
 class T84(discord.Bot, ABC):
@@ -34,6 +52,12 @@ class T84(discord.Bot, ABC):
             self.config.PARENT_GUILD = self.config.BACKEND_GUILD
             self.config.PARENT_GUILD_MAIN_CHAT = self.config.BACKEND_CHAT
             self.config.EVENT_CHANNEL_ID = self.config.BACKEND_CHAT
+
+    async def get_application_context(
+        self, interaction: discord.Interaction, cls=T84ApplicationContext
+    ):
+        # The same method for custom application context.
+        return await super().get_application_context(interaction, cls=cls)
 
     # TODO: Should be re-written vvv
     def help_command_embed(self) -> discord.Embed:
@@ -71,9 +95,9 @@ class T84(discord.Bot, ABC):
         print(f"✔ Bot is ready, logged in as {self.user}")
 
     @staticmethod
-    async def log(message: str, level: DEBUG | INFO | WARNING | ERROR | CRITICAL) -> None:
+    async def send_critical_log(message: str, level: WARNING | ERROR | CRITICAL) -> None:
         """
-        Message will be forwarded to local logging module and filesystem
+        Message will be forwarded to local logging module + filesystem
         and also sent out via discord webhook if needed.
 
         :param level: level of log
@@ -86,12 +110,11 @@ class T84(discord.Bot, ABC):
             msg=message
         )
 
-        if level >= INFO:
-            content = f'`[{logging.getLevelName(level)}]` {message}'
+        content = f'`[{logging.getLevelName(level)}]` {message}'
 
-            async with aiohttp.ClientSession() as session:
-                webhook = Webhook.from_url(os.getenv("LOGGING_WEBHOOK"), session=session)
-                await webhook.send(content=content)
+        async with aiohttp.ClientSession() as session:
+            webhook = Webhook.from_url(os.getenv("LOGGING_WEBHOOK"), session=session)
+            await webhook.send(content=content)
 
     async def on_application_command_error(
             self, ctx: discord.ApplicationContext, error: discord.ApplicationCommandError
@@ -137,7 +160,7 @@ class T84(discord.Bot, ABC):
         )
 
         # capture_exception(error)
-        await self.log(str(error), logging.ERROR)
+        await self.send_critical_log(str(error), logging.ERROR)
         raise error
 
 

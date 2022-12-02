@@ -1,6 +1,6 @@
 import discord
 
-from src import DefaultEmbed
+from src import DefaultEmbed, T84ApplicationContext
 from src.rewards import Reward, leveled_rewards, get_formatted_reward_string
 
 
@@ -10,7 +10,7 @@ class Rewards(discord.Cog):
 
     @discord.slash_command(name='rewards', description='🔮 Список нагород для вказаного рівню.')
     async def rewards(
-            self, ctx: discord.ApplicationContext, level: discord.Option(int, description='Рівень')
+            self, ctx: T84ApplicationContext, level: discord.Option(int, description='Рівень')
     ):
         rewards: list[Reward] = leveled_rewards.get(level)
 

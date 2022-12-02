@@ -1,5 +1,5 @@
 import discord
-from src.bot import T84
+from src.bot import T84, T84ApplicationContext
 
 
 class HelpCommand(discord.Cog):
@@ -7,7 +7,7 @@ class HelpCommand(discord.Cog):
         self.bot = bot
 
     @discord.slash_command(name='help', description='❓ Допомога по боту')
-    async def help(self, ctx: discord.ApplicationContext):
+    async def help(self, ctx: T84ApplicationContext):
         await ctx.respond(embed=self.bot.help_command_embed())
 
 
