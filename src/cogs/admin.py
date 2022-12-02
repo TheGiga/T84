@@ -8,8 +8,10 @@ from src.bot import T84, T84ApplicationContext
 from src.models import User
 from src.rewards import leveled_rewards
 
-achievements = [x.value.uid for x in Achievements]
-inventoriable_items = [x.uid for x in Unique.__instances__.values() if issubclass(x.__class__, Inventoriable)]
+achievements = [discord.OptionChoice(str(x.value.name), x.value.uid) for x in Achievements]
+inventoriable_items = [
+    discord.OptionChoice(str(x), x.uid) for x in Unique.__instances__.values() if issubclass(x.__class__, Inventoriable)
+]
 
 
 def admin_check(ctx: discord.ApplicationContext):
@@ -25,12 +27,12 @@ class AdminCommands(discord.Cog):
     recalculate = admin.create_subgroup("recalculate", "♻")
 
     @add.command(name='inventory_item')
+    @commands.check(admin_check)
     async def adm_add_inventory_item(
             self, ctx: T84ApplicationContext,
             item_id: discord.Option(int, name='item', choices=inventoriable_items),
-            member: discord.Option(discord.Member) = None
+            member: discord.Option(discord.Member)
     ):
-        member = member or ctx.author
         user, _ = await User.get_or_create(discord_id=member.id)
 
         item = Unique.get_from_id(item_id)
