@@ -8,9 +8,15 @@ from src.bot import T84, T84ApplicationContext
 from src.models import User
 from src.rewards import leveled_rewards
 
-achievements = [discord.OptionChoice(str(x.value.name), x.value.uid) for x in Achievements]
+achievements = [
+    discord.OptionChoice(x.value.name, x.value.uid)
+    for x in Achievements
+]
+
 inventoriable_items = [
-    discord.OptionChoice(str(x), x.uid) for x in Unique.__instances__.values() if issubclass(x.__class__, Inventoriable)
+    discord.OptionChoice(str(x), x.uid)
+    for x in Unique.__instances__.values()
+    if issubclass(x.__class__, Inventoriable)
 ]
 
 

@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from discord import ExtensionNotFound
 from datetime import datetime as dt
 from tortoise import connections
+from pycord.multicog import apply_multicog
 
 load_dotenv()
 
@@ -66,6 +67,8 @@ async def main():
             print(f'✅ Extension {cog} successfully loaded!')
         except ExtensionNotFound:
             print(f'❌ Failed to load extension {cog}')
+
+    apply_multicog(bot_instance)
 
     unique_instances = json.dumps(dict(Unique.__instances__), indent=4, default=str, ensure_ascii=False, sort_keys=True)
     logging.info(f"Unique instances processed: {unique_instances}")

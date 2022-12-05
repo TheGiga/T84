@@ -52,6 +52,12 @@ class T84(discord.Bot, ABC):
             self.config.PARENT_GUILD = self.config.BACKEND_GUILD
             self.config.PARENT_GUILD_MAIN_CHAT = self.config.BACKEND_CHAT
             self.config.EVENT_CHANNEL_ID = self.config.BACKEND_CHAT
+            self.config.SELF_ROLES_IDS = [1049431166442279074]
+            self.config.SELF_ROLES_CHANNEL_ID = self.config.BACKEND_CHAT
+
+    @property
+    async def parent_guild(self) -> discord.Guild | None:
+        return await discord.utils.get_or_fetch(self, 'guild', self.config.PARENT_GUILD)
 
     async def get_application_context(
         self, interaction: discord.Interaction, cls=T84ApplicationContext

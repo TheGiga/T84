@@ -20,6 +20,7 @@ cogs: list = [
     "src.cogs.chat_events",
     "src.cogs.stat_tracker",
     "src.cogs.achievements",
+    "src.cogs.interactive_views"
 ]
 
 # Filter
@@ -33,3 +34,8 @@ FLAG_EVENT_PRIZE: int = 10
 
 LEVEL_MIN_MAX = 9, 13
 XP_MULTIPLIER = 0.25
+
+# Self Roles
+
+SELF_ROLES_CHANNEL_ID: int = 997882210772324433
+SELF_ROLES_IDS: list[int] = [997873530395959398, 997873519612403782, 997873508354883584]
