@@ -64,7 +64,7 @@ class AdminCommands(discord.Cog):
                 break
 
             rewards_raw = leveled_rewards.get(reward_level)
-            rewards_to_apply = tuple(x for x in rewards_raw if x.value.code == reward_type)
+            rewards_to_apply = tuple(x for x in rewards_raw if x.code == reward_type)
 
             overall_applied_rewards.extend(rewards_to_apply)
 
@@ -73,7 +73,7 @@ class AdminCommands(discord.Cog):
         content = f"☑ Успішно, видані нагороди: ```py\n{overall_applied_rewards}```"
 
         if reward_type == "balance":
-            content += f'\n\nУсього: `{sum(x.value.payload for x in overall_applied_rewards)}` 💸'
+            content += f'\n\nУсього: `{sum(x.payload for x in overall_applied_rewards)}` 💸'
 
         await ctx.respond(content, ephemeral=True)
 

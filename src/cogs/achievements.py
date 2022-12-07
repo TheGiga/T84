@@ -26,30 +26,29 @@ class Achievements(discord.Cog):
         embed.title = f"Досягнення користувача {discord_instance.display_name}"
         embed.set_thumbnail(url=discord_instance.display_avatar.url)
 
-        msg_achievement: MsgCountAchievement | None = None
+        msg_achievement = None
 
         other_achievements = ""
 
-        for ach in user._achievements:
-            ach_object = Achievement.get_from_id(ach)
-            if type(ach_object) is MsgCountAchievement:
-                msg_achievement = ach_object
+        for ach in user.achievements:
+            if type(ach) is MsgCountAchievement:
+                msg_achievement = ach
 
             else:
-                other_achievements += f"☑️ {ach_object.name} `({ach_object.fake_id})`\n"
+                other_achievements += f"☑️ {ach.name} `({ach.fake_id})`\n"
 
-        if msg_achievement is not None:
+        if msg_achievement:
             embed.add_field(name=f'{msg_achievement.name}', value=f'{msg_achievement.description}')
 
         embed.description = f"""
-        Кількість досягнень: `{len(user._achievements)}/{len(AchievementsEnum)}`
+        Кількість досягнень: `{len(user.achievements)}/{len(AchievementsEnum)}`
         
         {other_achievements}
         ──────────────────────────
         """
 
         await ctx.respond(embed=embed)
-        # await user.add_achievement(achievement=AchievementsEnum.get_from_id(8), notify_user=True)
+        # await user.add_achievement(achievement=AchievementsEnum.get_from_id(2008), notify_user=True)
 
     @discord.slash_command(name='achievement', description='⭐ Подивитися інформацію про досягнення.')
     async def achievement(

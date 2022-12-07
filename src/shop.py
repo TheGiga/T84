@@ -14,6 +14,8 @@ class ItemValue:
 
 
 class ShopItem(Unique, Inventoriable):
+    __slots__ = ('uid', 'label', 'cost', 'emoji', 'value', 'description')
+
     def __init__(self, uid: int, label: str, cost: int, emoji: str, value: ItemValue, description: str = None):
         self.label = label
         self.cost = cost

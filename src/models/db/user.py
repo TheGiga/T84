@@ -53,8 +53,15 @@ class User(Model):
     @property
     def inventory(self) -> list[Inventoriable]:
         return [
-            Unique.get_from_id(item_id)
-            for item_id in self._inventory
+            Unique.get_from_id(uid)
+            for uid in self._inventory
+        ]
+
+    @property
+    def achievements(self) -> list['Achievement']:
+        return [
+            Unique.get_from_id(uid)
+            for uid in self._achievements
         ]
 
     @property
@@ -236,8 +243,8 @@ class User(Model):
                 rewards.extend(ext if ext is not None else [])
 
             for reward in rewards:
-                reward_value = await reward.apply(self)
-                rewards_string += f'\n{get_formatted_reward_string(reward_value)}'
+                await reward.apply(self)
+                rewards_string += f'\n{get_formatted_reward_string(reward)}'
 
             self.level = level
             await self.save()

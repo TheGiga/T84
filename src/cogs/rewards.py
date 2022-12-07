@@ -27,7 +27,7 @@ class Rewards(discord.Cog):
         desc = ""
 
         for reward in rewards:
-            desc += f"{get_formatted_reward_string(reward.value)}\n"
+            desc += f"{get_formatted_reward_string(reward)}\n"
 
         embed.description = desc
 
