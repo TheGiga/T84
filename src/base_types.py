@@ -13,9 +13,12 @@ class Unique:
         self.uid = uid
         self.__instances__[uid] = cls
 
-    @property
-    def instances(self) -> dict:
-        return self.__instances__
+    @classmethod
+    def get_instances(cls) -> list:
+        """
+        :return: a list of Unique instances
+        """
+        return list(cls.__instances__.values())
 
     @classmethod
     def get_from_id(cls, uid: int) -> Any:

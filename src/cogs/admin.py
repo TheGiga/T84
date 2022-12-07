@@ -15,7 +15,7 @@ achievements = [
 
 inventoriable_items = [
     discord.OptionChoice(str(x), x.uid)
-    for x in Unique.__instances__.values()
+    for x in Unique.get_instances()
     if issubclass(x.__class__, Inventoriable)
 ]
 

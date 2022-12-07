@@ -70,7 +70,7 @@ async def main():
 
     apply_multicog(bot_instance)
 
-    unique_instances = json.dumps(dict(Unique.__instances__), indent=4, default=str, ensure_ascii=False, sort_keys=True)
+    unique_instances = json.dumps(Unique.__instances__, indent=4, default=str, ensure_ascii=False, sort_keys=True)
     logging.info(f"Unique instances processed: {unique_instances}")
 
     if bot_instance.debug:
