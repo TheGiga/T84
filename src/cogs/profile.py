@@ -18,7 +18,10 @@ shop_roles_uids = [
 
 
 class ToggleShopRoles(discord.ui.Select):
-    def __init__(self, user_shop_roles: list[ShopItem]):
+    def __init__(self, user: User, user_shop_roles: list[ShopItem]):
+
+        self.user: User = user
+
         options = [
             discord.SelectOption(label=item.label, emoji=item.emoji, value=str(item.uid))
             for item in user_shop_roles
@@ -32,17 +35,22 @@ class ToggleShopRoles(discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
+
+        if interaction.user.id != self.user.discord_id:
+            return await interaction.response.send_message('❌ Заборонено!')
+
+        user_discord_instance = await self.user.get_discord_instance()
         toggled_roles = ''
 
         for value in self.values:
             shop_item: ShopItem = ShopItem.get_from_id(int(value))
             role = await discord.utils.get_or_fetch(interaction.guild, 'role', shop_item.value.payload)
 
-            if role in interaction.user.roles:
-                await interaction.user.add_roles(role)
+            if role in user_discord_instance.roles:
+                await user_discord_instance.remove_roles(role)
                 toggled_roles += f'**+** {role.mention}\n\n'
             else:
-                await interaction.user.remove_roles(role)
+                await user_discord_instance.add_roles(role)
                 toggled_roles += f'**-** {role.mention}\n\n'
 
         await interaction.response.send_message(content=toggled_roles, ephemeral=True)
@@ -101,7 +109,7 @@ class Profile(discord.Cog):
             ]
 
             if len(user_shop_roles) > 0:
-                view.add_item(ToggleShopRoles(user_shop_roles))
+                view.add_item(ToggleShopRoles(user=user_instance, user_shop_roles=user_shop_roles))
 
         await ctx.respond(embed=embed, view=view)
 
