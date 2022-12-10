@@ -14,16 +14,26 @@ from src.utils import progress_bar
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.achievements import Achievement
+    from src.achievements import Achievement, MsgCountAchievement
+    from src.rewards import Reward
 
 
 class User(Model):
+    # Basic
+
     id = fields.IntField(pk=True)
     discord_id = fields.IntField()
+
+    # Variables
+
+    # Data
+
     xp = fields.IntField(default=0)
     level = fields.IntField(default=0)
     message_count = fields.IntField(default=0)
     balance = fields.IntField(default=0)
+
+    # Storage-able
 
     _achievements = fields.JSONField(source_field="achievements", default=[])
     _inventory = fields.JSONField(source_field="inventory", default=[])
@@ -51,7 +61,7 @@ class User(Model):
         return floor(lvl_raw)
 
     @property
-    def inventory(self) -> list[Inventoriable]:
+    def inventory(self) -> list[Unique | Inventoriable]:
         return [
             Unique.get_from_id(uid)
             for uid in self._inventory
@@ -124,7 +134,7 @@ class User(Model):
             await self.send_embed(embed)
 
     async def add_achievement(
-            self, achievement: 'Achievement', notify_user: bool = False
+            self, achievement: 'Achievement' or 'MsgCountAchievement', notify_user: bool = False
     ) -> None:
         current_achievements = list(self._achievements)
         if achievement.uid in current_achievements:

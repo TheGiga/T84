@@ -39,7 +39,7 @@ class Tracker(discord.Cog):
         local_cache = self.message_tracker_cache.copy()
 
         message_count_achievements = tuple(
-            ach for ach in Achievements if type(ach.value) is MsgCountAchievement
+            ach.value for ach in Achievements if type(ach.value) is MsgCountAchievement
         )
 
         for key in local_cache.keys():
@@ -49,8 +49,8 @@ class Tracker(discord.Cog):
             await user.save()
 
             for ach in message_count_achievements:
-                if user.message_count > ach.value.message_count:
-                    await user.add_achievement(ach.value, notify_user=True)
+                if user.message_count > ach.message_count:
+                    await user.add_achievement(ach, notify_user=True)
 
         self.message_tracker_cache.clear()
 
