@@ -37,7 +37,7 @@ class ToggleShopRoles(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
 
         if interaction.user.id != self.user.discord_id:
-            return await interaction.response.send_message('❌ Заборонено!')
+            return await interaction.response.send_message('❌ Заборонено!', ephemeral=True)
 
         user_discord_instance = await self.user.get_discord_instance()
         toggled_roles = ''
@@ -48,10 +48,10 @@ class ToggleShopRoles(discord.ui.Select):
 
             if role in user_discord_instance.roles:
                 await user_discord_instance.remove_roles(role)
-                toggled_roles += f'**+** {role.mention}\n\n'
+                toggled_roles += f'**-** {role.mention}\n\n'
             else:
                 await user_discord_instance.add_roles(role)
-                toggled_roles += f'**-** {role.mention}\n\n'
+                toggled_roles += f'**+** {role.mention}\n\n'
 
         await interaction.response.send_message(content=toggled_roles, ephemeral=True)
 
