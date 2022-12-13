@@ -1,4 +1,3 @@
-import random
 import discord
 from typing import Any
 from discord.ext import tasks
@@ -49,7 +48,7 @@ class Leveling(discord.Cog):
 
         final_xp = self.bot.config.XP_BASE * user.xp_multiplier
 
-        await user.add_xp(final_xp)
+        await user.add_xp(round(final_xp))
 
         lvl, affected, rewards = await user.update_levels()
 
