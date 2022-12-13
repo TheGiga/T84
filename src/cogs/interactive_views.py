@@ -1,6 +1,4 @@
 import discord
-from discord.ext import commands
-
 from src.bot import T84, T84ApplicationContext
 from pycord.multicog import add_to_group
 from .. import DefaultEmbed
@@ -15,23 +13,26 @@ class SelfRoleButton(discord.ui.Button):
         )
 
     async def callback(self, interaction: discord.Interaction):
+        new_interaction = await interaction.response.send_message(content='🔃 У процесі...', ephemeral=True)
+
         user = interaction.user
         role = interaction.guild.get_role(int(self.custom_id))
 
+        original_response = await new_interaction.original_response()
+
         if role is None:
+            await original_response.edit("❌ Сталася помилка :(")
             return
 
         if role not in user.roles:
             await user.add_roles(role)
-            await interaction.response.send_message(
+            await original_response.edit(
                 f"☑ Вам було успішно видано роль {role.mention}!",
-                ephemeral=True,
             )
         else:
             await user.remove_roles(role)
-            await interaction.response.send_message(
+            await original_response.edit(
                 f"❌ Роль {role.mention} було успішно забрано у вас.",
-                ephemeral=True,
             )
 
 
