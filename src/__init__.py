@@ -1,13 +1,5 @@
 import discord
 
-
-def process_unique_instances():
-    from .base_types import Unique
-    import src.achievements
-    import src.rewards
-    import src.shop
-
-
 class DefaultEmbed(discord.Embed):
     def __init__(self):
         super().__init__()

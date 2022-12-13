@@ -10,17 +10,17 @@ PG_INVITE: str = "https://discord.gg/8GHx6ak8cs"
 ADMINS: list[int] = [352062534469156864, 690237585372610560]
 
 cogs: list = [
-    "src.cogs.shop",
-    "src.cogs.help",
-    "src.cogs.admin",
-    "src.cogs.filter",
-    "src.cogs.profile",
-    "src.cogs.rewards",
-    "src.cogs.leveling",
-    "src.cogs.chat_events",
-    "src.cogs.stat_tracker",
-    "src.cogs.achievements",
-    "src.cogs.interactive_views"
+    "shop",
+    "help",
+    "admin",
+    "filter",
+    "profile",
+    "rewards",
+    "leveling",
+    "chat_events",
+    "stat_tracker",
+    "achievements",
+    "interactive_views"
 ]
 
 # Filter
@@ -32,7 +32,7 @@ FLAG_EVENT_PRIZE: int = 10
 
 # Leveling
 
-LEVEL_MIN_MAX = 9, 13
+XP_BASE = 10
 XP_MULTIPLIER = 0.25
 
 # Self Roles

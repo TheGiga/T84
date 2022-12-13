@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
 # )
 
 import config
-from src import process_unique_instances, bot_instance, GuildNotWhitelisted, T84ApplicationContext
+from src import bot_instance, GuildNotWhitelisted, T84ApplicationContext
 from src.models import User
 from src.database import db_init
 from src.base_types import Unique
@@ -58,12 +58,9 @@ async def overall_check(ctx: T84ApplicationContext):
 
 
 async def main():
-    print("🔃 Processing unique instances...")
-    process_unique_instances()
-
     for cog in config.cogs:
         try:
-            bot_instance.load_extension(cog)
+            bot_instance.load_extension(f'src.cogs.{cog}')
             print(f'✅ Extension {cog} successfully loaded!')
         except ExtensionNotFound:
             print(f'❌ Failed to load extension {cog}')

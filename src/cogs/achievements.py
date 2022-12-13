@@ -93,13 +93,21 @@ class Achievements(discord.Cog):
         if user.guild.id != self.bot.config.PARENT_GUILD:
             return
 
-        if reaction.emoji == "🍉":
-            user, _ = await User.get_or_create(discord_id=user.id)
-            await user.add_achievement(Achievement.get_from_id(2009), notify_user=True)
+        match reaction.emoji:
+            case "🍉":
+                user, _ = await User.get_or_create(discord_id=user.id)
+                await user.add_achievement(Achievement.get_from_id(2009), notify_user=True)
 
-        elif reaction.emoji == "💣":
-            user, _ = await User.get_or_create(discord_id=user.id)
-            await user.add_achievement(Achievement.get_from_id(2014), notify_user=True)
+            case "💣":
+                user, _ = await User.get_or_create(discord_id=user.id)
+                await user.add_achievement(Achievement.get_from_id(2014), notify_user=True)
+
+            case "💀":
+                user, _ = await User.get_or_create(discord_id=user.id)
+                await user.add_achievement(Achievement.get_from_id(2008), notify_user=True)
+
+            case _:
+                pass
 
 
 def setup(bot: T84):

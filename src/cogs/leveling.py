@@ -42,11 +42,14 @@ class Leveling(discord.Cog):
         if message.author.id in self.cache or message.author.bot:
             return
 
+        if len(message.content) < 10:
+            return
+
         user, _ = await User.get_or_create(discord_id=message.author.id)
 
-        xp = random.randint(*self.bot.config.LEVEL_MIN_MAX)
+        final_xp = self.bot.config.XP_BASE * user.xp_multiplier
 
-        await user.add_xp(xp)
+        await user.add_xp(final_xp)
 
         lvl, affected, rewards = await user.update_levels()
 

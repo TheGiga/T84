@@ -3,7 +3,6 @@ from discord.ext import commands
 
 from src.bot import T84, T84ApplicationContext
 from pycord.multicog import add_to_group
-from .admin import admin_check
 from .. import DefaultEmbed
 
 
@@ -40,9 +39,11 @@ class InteractiveViews(discord.Cog):
     def __init__(self, bot: T84):
         self.bot = bot
 
+    def cog_check(self, ctx: discord.ApplicationContext):
+        return ctx.author.id in self.bot.config.ADMINS
+
     # TODO: Make this command universal
     @add_to_group("admin")
-    @commands.check(admin_check)
     @discord.slash_command(name='post_self_roles', description='🛑 Administrative control on interactive views.')
     async def adm_post_view(
             self, ctx: T84ApplicationContext

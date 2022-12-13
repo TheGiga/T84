@@ -26,17 +26,23 @@ class User(Model):
 
     # Variables
 
+    beta = fields.BooleanField(default=False)
+
     # Data
 
     xp = fields.IntField(default=0)
     level = fields.IntField(default=0)
     message_count = fields.IntField(default=0)
     balance = fields.IntField(default=0)
+    premium_balance = fields.IntField(default=0)
 
     # Storage-able
 
     _achievements = fields.JSONField(source_field="achievements", default=[])
     _inventory = fields.JSONField(source_field="inventory", default=[])
+
+    # Other
+    xp_multiplier = fields.FloatField(default=1.0)
 
     def __int__(self):
         return self.discord_id
@@ -130,6 +136,19 @@ class User(Model):
             embed.set_author(name='ДТВУ', url=config.PG_INVITE)
             embed.description = f"Вам нараховано 💸 **Баланс** у розмірі `{amount}`"
             embed.colour = discord.Colour.gold()
+
+            await self.send_embed(embed)
+
+    async def add_premium_balance(self, amount: int, notify_user: bool = False) -> None:
+        self.premium_balance += amount
+        await self.save()
+
+        if notify_user:
+            embed = DefaultEmbed()
+
+            embed.set_author(name='ДТВУ', url=config.PG_INVITE)
+            embed.description = f"Вам нараховано 💎 **Преміум баланс** у розмірі `{amount}`"
+            embed.colour = discord.Colour.blue()
 
             await self.send_embed(embed)
 
