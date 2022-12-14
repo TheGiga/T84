@@ -46,14 +46,6 @@ async def overall_check(ctx: T84ApplicationContext):
 
     ctx._user_instance = user
 
-    checks = tuple(x.__name__ for x in ctx.command.checks)
-    if "admin_check" in checks:
-        await bot_instance.send_critical_log(
-            f"ADMIN COMMAND </{ctx.command.qualified_name}:{ctx.command.qualified_id}> "
-            f"just used by {ctx.author} {ctx.author.mention}",
-            logging.WARNING
-        )
-
     return True
 
 
