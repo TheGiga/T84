@@ -80,9 +80,11 @@ class T84(discord.Bot, ABC):
 
         slash_count = 0
         for slash_count, slash in enumerate(
-                [command
-                 for command in raw_commands
-                 if type(command) is discord.SlashCommand]
+                [
+                    command
+                    for command in raw_commands
+                    if type(command) is discord.SlashCommand
+                ], 1
         ):
             ordinary_commands += f'{slash.mention} » {slash.description}\n'
             raw_commands.remove(slash)
