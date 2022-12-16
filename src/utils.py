@@ -1,8 +1,7 @@
 def progress_bar(percent: int) -> str:
-    raw_percents = percent // 10
     bar = ""
 
-    for _ in range(raw_percents):
+    for i in range(round(max(min(percent, 100), 0) / 10)):
         bar += "🟨"
 
     return bar.ljust(10, "⬛")

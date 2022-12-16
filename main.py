@@ -41,6 +41,9 @@ async def overall_check(ctx: T84ApplicationContext):
         )
         raise GuildNotWhitelisted(ctx.guild_id)
 
+    if not ctx.bot.is_ready():
+        await ctx.bot.wait_until_ready()
+
     # User creation if not present
     user, _ = await User.get_or_create(discord_id=ctx.user.id)
 

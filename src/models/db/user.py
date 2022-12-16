@@ -214,9 +214,6 @@ class User(Model):
                 > ```{self.level} {progress_bar(self.l_tnl_percent)} {self.level + 1}```
                 """
 
-        # Placeholder image to make embed have the same width everytime
-        embed.set_image(url="https://i.imgur.com/WozcNGD.png")
-
         return embed
 
     async def get_discord_instance(self, preload_guild: discord.Guild = None) -> discord.Member | None:

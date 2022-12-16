@@ -7,6 +7,7 @@ from abc import ABC
 from art import tprint
 from discord import Webhook, Interaction
 from discord.ext.commands import MissingPermissions
+from discord.ext import tasks
 from discord.errors import CheckFailure
 
 import config
@@ -45,6 +46,8 @@ class T84(discord.Bot, ABC):
         self.config = config
         self.debug = False
 
+        self.activity_updater.start()
+
         if os.getenv("BOT_DEBUG") == "True":
             self.debug = True
             logging.info("T84 Debug mode, aka testing.")
@@ -60,41 +63,72 @@ class T84(discord.Bot, ABC):
         return await discord.utils.get_or_fetch(self, 'guild', self.config.PARENT_GUILD)
 
     async def get_application_context(
-        self, interaction: discord.Interaction, cls=T84ApplicationContext
+            self, interaction: discord.Interaction, cls=T84ApplicationContext
     ):
         # The same method for custom application context.
         return await super().get_application_context(interaction, cls=cls)
 
-    # TODO: Should be re-written vvv
-    def help_command_embed(self) -> discord.Embed:
-        embed = discord.Embed(colour=discord.Colour.embed_background(), timestamp=discord.utils.utcnow())
-        embed.title = 'Допомога'
-        embed.set_footer(text='by gigalegit-#0880')
+    def help_command(self) -> list[discord.Embed]:
+        embed = discord.Embed()
+        embed.colour = discord.Colour.embed_background()
+        embed.title = "Команди бота T84"
+        embed.set_image(url="https://i.imgur.com/WozcNGD.png")
 
-        slash_commands, slash_commands_count = '', 0
+        raw_commands = self.commands.copy()
 
-        for command in self.commands:
-            match command.__class__:
-                case discord.SlashCommandGroup:
-                    if command.name == "admin":
-                        continue
+        ordinary_commands = ''
 
-                    sub_commands = ''
-                    for sub_command in command.subcommands:
-                        sub_commands += f'> `{sub_command.name}` - {sub_command.description}\n'
-                    embed.add_field(name=f'/{command.qualified_name}', value=sub_commands)
-                case discord.SlashCommand:
-                    slash_commands += f'{command.mention} - {command.description}\n'
-                    slash_commands_count += 1
-                case _:
-                    continue
+        slash_count = 0
+        for slash_count, slash in enumerate(
+                [command
+                 for command in raw_commands
+                 if type(command) is discord.SlashCommand]
+        ):
+            ordinary_commands += f'{slash.mention} » {slash.description}\n'
+            raw_commands.remove(slash)
 
-        embed.description = f"""
-            **Слеш-команди**: `({slash_commands_count})`
-            {slash_commands}
-        """
+        embed.description = f'**Базові слеш-команди:** ({slash_count})\n{ordinary_commands}'
 
-        return embed
+        group_embeds = []
+
+        for group in [
+            group
+            for group in raw_commands
+            if type(group) is discord.SlashCommandGroup and group.name != 'admin'
+        ]:
+            group_embed = discord.Embed()
+            group_embed.colour = discord.Colour.embed_background()
+            group_embed.title = f'/{group.name}'
+            group_embed.set_image(url="https://i.imgur.com/WozcNGD.png")
+
+            group_commands = list(group.walk_commands())
+            description = ''
+
+            for subgroup in [
+                sg
+                for sg in group_commands
+                if type(sg) is discord.SlashCommandGroup
+            ]:
+                value = ''
+
+                for subgroup_command in subgroup.walk_commands():
+                    value += f' - {subgroup_command.mention} » {subgroup_command.description}\n'
+                    group_commands.remove(subgroup_command)
+
+                group_embed.add_field(name=f"**/{subgroup.qualified_name}**:\n", value=value, inline=False)
+                group_commands.remove(subgroup)
+
+            # At this point, all non discord.SlashCommand entries should be removed
+            print(group_commands)
+            for group_command in group_commands:
+                description += f"{group_command.mention} » {group_command.description}\n"
+
+            group_embed.description = description
+
+            group_embeds.append(group_embed)
+            raw_commands.remove(group)
+
+        return [embed, *group_embeds]
 
     async def on_ready(self):
         tprint("T84")
@@ -168,6 +202,15 @@ class T84(discord.Bot, ABC):
         # capture_exception(error)
         await self.send_critical_log(str(error), logging.ERROR)
         raise error
+
+    @tasks.loop(hours=1)
+    async def activity_updater(self):
+        await self.wait_until_ready()
+        await self.change_presence(
+            activity=discord.Streaming(
+                name=f'/help | {len(self.commands)} Команд', url='https://twitch.tv/gigabit_0880'
+            )
+        )
 
 
 bot_instance = T84(intents=_intents)

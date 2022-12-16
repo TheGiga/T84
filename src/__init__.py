@@ -1,5 +1,6 @@
 import discord
 
+
 class DefaultEmbed(discord.Embed):
     def __init__(self):
         super().__init__()
