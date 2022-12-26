@@ -106,9 +106,6 @@ class Achievements(discord.Cog):
                 user, _ = await User.get_or_create(discord_id=user.id)
                 await user.add_achievement(Achievement.get_from_id(2008), notify_user=True)
 
-            case _:
-                pass
-
 
 def setup(bot: T84):
     bot.add_cog(Achievements(bot=bot))

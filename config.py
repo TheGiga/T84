@@ -32,7 +32,7 @@ FLAG_EVENT_PRIZE: int = 10
 
 # Leveling
 
-XP_BASE = 10
+XP_BASE = 12
 XP_MULTIPLIER = 0.25
 
 # Self Roles
