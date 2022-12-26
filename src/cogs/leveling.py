@@ -41,9 +41,6 @@ class Leveling(discord.Cog):
         if message.author.id in self.cache or message.author.bot:
             return
 
-        if len(message.content) < 10:
-            return
-
         user, _ = await User.get_or_create(discord_id=message.author.id)
 
         final_xp = self.bot.config.XP_BASE * user.xp_multiplier

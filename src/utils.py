@@ -1,7 +1,5 @@
+# Created by me, minimized size by Fenrir#6682
 def progress_bar(percent: int) -> str:
-    bar = ""
-
-    for i in range(round(max(min(percent, 100), 0) / 10)):
-        bar += "🟨"
-
-    return bar.ljust(10, "⬛")
+    bar = "⬛" * 10
+    bar = bar.replace("⬛", "🟨", round(max(min(percent, 100), 0) / 10))
+    return bar

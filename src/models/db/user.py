@@ -209,6 +209,9 @@ class User(Model):
 
         embed.set_thumbnail(url=member.display_avatar.url)
 
+        if member.banner:
+            embed.set_image(url=member.banner.url)
+
         embed.description = f"""
                 Прогрес до наступного рівню: `{self.xp}/{self.level_to_xp(self.level + 1)}`
                 > ```{self.level} {progress_bar(self.l_tnl_percent)} {self.level + 1}```

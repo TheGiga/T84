@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 # from sentry_sdk import capture_exception
 
 _intents = discord.Intents.default()
-_intents.__setattr__("messages", True)
+_intents.__setattr__("presences", True)
 _intents.__setattr__("message_content", True)
 _intents.__setattr__("members", True)
 
@@ -164,19 +164,22 @@ class T84(discord.Bot, ABC):
         if isinstance(error, GuildNotWhitelisted):
             return
 
-        if isinstance(error, MissingPermissions):
+        elif isinstance(error, MissingPermissions):
             embed = discord.Embed(colour=discord.Colour.red(), title='⚠ Заборонено!')
             embed.description = f"❌ Вам не дозволено виконання цієї команди!"
             await ctx.respond(embed=embed, ephemeral=True)
             return
 
-        if isinstance(error, CheckFailure):
+        elif isinstance(error, CheckFailure):
             embed = discord.Embed(colour=discord.Colour.red(), title='⚠ Заборонено!')
             embed.description = f"❌ Помилка перевірки!"
             await ctx.respond(embed=embed, ephemeral=True)
             return
 
-        if isinstance(error, discord.ApplicationCommandInvokeError):
+        elif isinstance(error, discord.NotFound):
+            return
+
+        elif isinstance(error, discord.ApplicationCommandInvokeError):
             await ctx.respond(
                 "Сталася невідома помилка, я доповів про цей кейс розробнику.\n\n"
                 "Якщо це буде повторюватись - напишіть розробнику: `gigalegit-#0880`\n"
@@ -193,13 +196,14 @@ class T84(discord.Bot, ABC):
                 ephemeral=False
             )
 
-        await ctx.send(
-            embed=discord.Embed(
-                title=error.__class__.__name__,
-                description=str(error),
-                color=discord.Colour.embed_background(),
+        else:
+            await ctx.send(
+                embed=discord.Embed(
+                    title=error.__class__.__name__,
+                    description=str(error),
+                    color=discord.Colour.embed_background(),
+                )
             )
-        )
 
         # capture_exception(error)
         await self.send_critical_log(str(error), logging.ERROR)
