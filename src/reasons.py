@@ -20,3 +20,8 @@ class Reasons(Enum):
                           td(hours=24))
     NSFW = Reason(6, 'NSFW (Not Safe for Work) контент', 'timeout', td(hours=24))
     IDIOTIC_BEHAVIOUR = Reason(7, '"Не будь довбойобом"', 'timeout', td(minutes=30))
+
+    @classmethod
+    def get_from_id(cls, _id: int, /) -> Reason:
+        reasons = list(cls)
+        return reasons[_id - 1].value

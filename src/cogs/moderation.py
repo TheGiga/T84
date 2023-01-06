@@ -26,7 +26,7 @@ class Moderation(discord.Cog):
                        choices=reasons, description='Причина покарання.'
                    )):
         # "Reason id is 7, but indexing starts at 0, so I decrease it by 1"
-        enum_reason = list(Reasons)[int(reason) - 1].value
+        enum_reason = Reasons.get_from_id(int(reason))
 
         await ctx.defer(ephemeral=True)
 
