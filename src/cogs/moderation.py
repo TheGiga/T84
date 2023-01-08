@@ -46,7 +46,7 @@ class Moderation(discord.Cog):
             case 'ban':
                 embed.title = f'Вам було видано БАН на сервері ДТВУ!'
                 # TODO: Сделать ебучий разбан по времени потом))
-                embed.set_field_at(2, name='⏰ Термін', value='__НАЗАВЖДИ__')  # value=str(enum_reason.duration))#
+                #embed.add_field(2, name='⏰ Термін', value='__НАЗАВЖДИ__')  # value=str(enum_reason.duration))#
                 embed.colour = discord.Colour.red()
 
                 await member.send(embed=embed)
