@@ -40,7 +40,11 @@ class Moderation(discord.Cog):
                 embed.title = f'Вам було видано мут на сервері ДТВУ.'
                 embed.colour = discord.Colour.orange()
 
-                await member.send(embed=embed)
+                try:
+                    await member.send(embed=embed)
+                except discord.Forbidden:
+                    pass
+
                 await member.timeout_for(duration=enum_reason.duration, reason=enum_reason.name)
 
             case 'ban':
@@ -49,7 +53,11 @@ class Moderation(discord.Cog):
                 #embed.add_field(2, name='⏰ Термін', value='__НАЗАВЖДИ__')  # value=str(enum_reason.duration))#
                 embed.colour = discord.Colour.red()
 
-                await member.send(embed=embed)
+                try:
+                    await member.send(embed=embed)
+                except discord.Forbidden:
+                    pass
+
                 await member.ban(reason=enum_reason.name)
 
         await self.bot.send_critical_log(
