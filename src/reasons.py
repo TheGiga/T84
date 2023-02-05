@@ -19,7 +19,9 @@ class Reasons(Enum):
     HUGE_INSULTS = Reason(5, 'Приниження людей, факт неадекватного спілкування', 'timeout',
                           td(hours=6))
     NSFW = Reason(6, 'NSFW (Not Safe for Work) контент', 'timeout', td(hours=24))
-    IDIOTIC_BEHAVIOUR = Reason(7, '"Не будь довбойобом"', 'timeout', td(minutes=30))
+    FLOOD = Reason(7, 'Флуд', 'timeout', td(minutes=30))
+    ADVERTISING = Reason(8, 'Реклама', 'timeout', td(hours=6))
+
 
     @classmethod
     def get_from_id(cls, _id: int, /) -> Reason:
