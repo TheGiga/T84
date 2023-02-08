@@ -22,7 +22,6 @@ class Reasons(Enum):
     FLOOD = Reason(7, 'Флуд', 'timeout', td(minutes=30))
     ADVERTISING = Reason(8, 'Реклама', 'timeout', td(hours=6))
 
-
     @classmethod
     def get_from_id(cls, _id: int, /) -> Reason:
         reasons = list(cls)
