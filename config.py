@@ -19,6 +19,7 @@ cogs: list = [
     "profile",
     "rewards",
     "leveling",
+    "gambling",
     "moderation",
     "chat_events",
     "stat_tracker",
