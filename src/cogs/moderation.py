@@ -1,7 +1,7 @@
 import logging
 
 import discord
-from discord.ext.commands import has_permissions
+from discord.ext.commands import has_permissions, cooldown, BucketType
 
 from src import DefaultEmbed
 from src.bot import T84, T84ApplicationContext
@@ -20,6 +20,7 @@ class Moderation(discord.Cog):
     moderation = discord.SlashCommandGroup(name='moderation', description='👮 Команди модератора.')
 
     @has_permissions(moderate_members=True)
+    @cooldown(3, 60, BucketType.user)
     @moderation.command(name='action', description='👮 Команда модератора: ПОКАРАННЯ')
     async def mute(self, ctx: T84ApplicationContext, member: discord.Option(discord.Member),
                    reason: discord.Option(
@@ -29,6 +30,11 @@ class Moderation(discord.Cog):
         enum_reason = Reasons.get_from_id(int(reason))
 
         await ctx.defer(ephemeral=True)
+
+        if ctx.user.top_role.position < member.top_role.position:
+            return await ctx.respond(
+                content="❌ Неможливо задати покарання для користувача з рол'ю вище вашої.", ephemeral=True
+            )
 
         embed = DefaultEmbed()
         embed.description = f'**Причина:** `{enum_reason.name}`'

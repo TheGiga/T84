@@ -7,6 +7,7 @@ from abc import ABC
 from art import tprint
 from discord import Webhook, Interaction
 from discord.ext.commands import MissingPermissions
+from discord.ext.commands import CommandOnCooldown
 from discord.ext import tasks
 from discord.errors import CheckFailure
 
@@ -178,6 +179,12 @@ class T84(discord.Bot, ABC):
 
         elif isinstance(error, discord.NotFound):
             return
+
+        elif isinstance(error, CommandOnCooldown):
+            return await ctx.respond(
+                content=f'❌ На цю команду діє кулдаун: `{round(error.cooldown.get_retry_after())} секунд`',
+                ephemeral=True
+            )
 
         elif isinstance(error, discord.ApplicationCommandInvokeError):
             await ctx.respond(
