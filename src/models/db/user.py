@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.achievements import Achievement, MsgCountAchievement
-    from src.rewards import Reward
 
 
 class User(Model):
@@ -126,7 +125,9 @@ class User(Model):
         self._inventory = inventory
         await self.save()
 
-    async def add_balance(self, amount: int, notify_user: bool = False) -> None:
+    async def add_balance(
+            self, amount: int, notify_user: bool = False, additional_message: str = None
+    ) -> None:
         self.balance += amount
         await self.save()
 
@@ -134,10 +135,13 @@ class User(Model):
             embed = DefaultEmbed()
 
             embed.set_author(name='ДТВУ', url=config.PG_INVITE)
-            embed.description = f"Вам нараховано 💸 **Баланс** у розмірі `{amount}`"
+            embed.description = f"Вам нараховано 💸 **Баланс** у розмірі `{amount}`" \
+                                f"\n{additional_message if additional_message is not None else ''}"
             embed.colour = discord.Colour.gold()
-
-            await self.send_embed(embed)
+            try:
+                await self.send_embed(embed)
+            except discord.HTTPException:
+                pass
 
     async def add_premium_balance(self, amount: int, notify_user: bool = False) -> None:
         self.premium_balance += amount
@@ -150,7 +154,10 @@ class User(Model):
             embed.description = f"Вам нараховано 💎 **Преміум баланс** у розмірі `{amount}`"
             embed.colour = discord.Colour.blue()
 
-            await self.send_embed(embed)
+            try:
+                await self.send_embed(embed)
+            except discord.HTTPException:
+                pass
 
     async def add_achievement(
             self, achievement: 'Achievement' or 'MsgCountAchievement', notify_user: bool = False
@@ -255,8 +262,7 @@ class User(Model):
         rewards_string = ""
 
         if level_gain > 0:
-            from src.rewards import Reward, get_formatted_reward_string
-            from src.rewards import leveled_rewards
+            from src.rewards import get_formatted_reward_string, leveled_rewards
             # Iterate through gained levels to add all lost rewards due to some reason.
             member_instance = await self.get_discord_instance()
 
@@ -264,7 +270,7 @@ class User(Model):
                 # User left the guild or something happened.
                 return level, False, rewards_string or None
 
-            rewards: list[Reward] = []
+            rewards: list = []
 
             for i in range(self.level, level):
                 ext = leveled_rewards.get(i + 1)

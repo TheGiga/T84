@@ -1,6 +1,4 @@
-import math
 from math import sqrt, floor
-
 import config
 
 
