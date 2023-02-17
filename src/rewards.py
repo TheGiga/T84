@@ -87,8 +87,8 @@ leveled_rewards: dict = {  # Leveled
 
 }
 
-for level in range(1, 101):
-    money = level * 20
+for level in range(1, 201):
+    money = level * 50
     try:
         leveled_rewards[level].append(BalanceReward(12000 + level, money))
     except KeyError:

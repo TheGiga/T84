@@ -208,7 +208,7 @@ class User(Model):
         embed.title = f"**Профіль користувача {member.display_name}**"
 
         embed.add_field(name='⚖ Рівень', value=f'`{self.level}`')
-        embed.add_field(name='⚗ Досвід', value=f'`{self.xp}`')
+        embed.add_field(name='⚗ Досвід', value=f'`{self.xp} ({self.xp_multiplier}x)`')
         embed.add_field(name='🏦 Баланс', value=f'`{self.balance}`')
         embed.add_field(name='🐦 Повідомлення', value=f'`{self.message_count}`')
         embed.add_field(name='⭐ Досягнення', value=f'`{len(self._achievements)}/{len(Achievements)}`')
