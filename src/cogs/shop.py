@@ -97,7 +97,9 @@ class Shop(discord.Cog):
 
     @discord.slash_command(name='shop', description='🏬 Магазин серверу.')
     async def shop(
-            self, ctx: T84ApplicationContext, shop_type: discord.Option(name="category", choices=['roles'])
+            self, ctx: T84ApplicationContext, shop_type: discord.Option(
+                name="category", choices=['roles', 'multipliers']
+            )
     ):
         await ctx.defer()
 

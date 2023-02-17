@@ -49,11 +49,17 @@ class ShopItem(Unique, Inventoriable):
                 role = discord_instance.guild.get_role(self.value.payload)
 
                 if role is not None:
-                    await discord_instance.add_roles(role, reason=f"Нагорода за рівень.")
+                    await discord_instance.add_roles(role, reason=f"Покупка ролі")
 
                 await user.add_inventory_item(self)
 
                 return self.value
+
+            case "multipliers":
+                x = round(user.xp_multiplier + self.value.payload, 10)
+                user.xp_multiplier = x
+
+                await user.save()
 
         # TODO: Add other items
 
@@ -88,6 +94,32 @@ class ShopItems(Enum):
         3006, "Акція \"РОШЕН\"", 10000, "🍫", ItemValue(
             "roles", 1064265157972328623),
         description="Шматок акції компанії ROSHEN. А може то пастка Порошенка ¯\\_(ツ)_/¯"
+    )
+
+    T72 = ShopItem(
+        3007, "Танк \"Т-72\"", 7200, "💥", ItemValue(
+            "roles", 1076135022379143208),
+        description="Танк Т-72 стандартної модифікації, ще не літав."
+    )
+
+    BRADLEY = ShopItem(
+        3008, "БМП \"Bradley\"", 3000, "🔫", ItemValue(
+            "roles", 1076135025575211039),
+        description='БМП Bradley - я її знайшов десь в Іраку.'
+    )
+
+    J2M5 = ShopItem(
+        3009, "Винищувач \"J2M5 Raiden\"", 6500, "✈", ItemValue(
+            "roles", 1076135008613433374),
+        description='Винищувач "J2M5 Raiden" імператорського флоту Японії, '
+                    'я його вкрав у Акамацу Садаакі поки він бухав.'
+    )
+
+    MULTIPLIER_0_1 = ShopItem(
+        3101, "Множник досвіду +0.1x", 1000, "⚗", ItemValue(
+            "multipliers", 0.1),
+        description="Додає +0.1x до вашого загального множника досвіду. "
+                    "Перевірити можна в /profile"
     )
 
 
