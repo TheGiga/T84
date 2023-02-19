@@ -32,7 +32,7 @@ BLACKLIST: list = ["🇿", "🇻", "🇷🇺"]
 
 # Events
 EVENT_CHANNEL_ID: int = PARENT_GUILD_MAIN_CHAT
-FLAG_EVENT_PRIZE: int = 10
+FLAG_EVENT_PRIZE: int = 100
 
 # Leveling
 

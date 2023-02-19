@@ -83,8 +83,7 @@ leveled_rewards: dict = {  # Leveled
     100: [
         RoleReward(9015, 1036956817516933120, 1075847339325001868),
         AchievementReward(9016, 2010)
-    ],  # Головнокомандуючий
-
+    ]  # Головнокомандуючий
 }
 
 for level in range(1, 201):

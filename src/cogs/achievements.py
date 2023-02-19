@@ -1,6 +1,4 @@
 import discord
-from typing import Union
-
 from src import DefaultEmbed
 from src.bot import T84, T84ApplicationContext
 from src.achievements import Achievement, Achievements as AchievementsEnum, MsgCountAchievement
@@ -59,7 +57,7 @@ class Achievements(discord.Cog):
     ):
         # +2000 because I use fake achievement ID's on frontend, so people can easily manage them.
         # 1, 2, 3 is better than 2001, 2002, 2003... right?
-        achievement: Union[Achievement, None] = Achievement.get_from_id(identifier+2000)
+        achievement: Achievement | None = Achievement.get_from_id(identifier+2000)
 
         if achievement is None:
             return await ctx.respond(content="❌ Досягнення з таким номером не знайдено!", ephemeral=True)
