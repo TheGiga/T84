@@ -7,7 +7,7 @@ class GuildNotWhitelisted(discord.ApplicationCommandError):
 
 
 class UniqueIdAlreadyTaken(Exception):
-    def __int__(self, uid):
+    def __init__(self, uid):
         logging.critical(f"Unique class with UID {uid} already registered!")
 
 

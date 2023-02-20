@@ -35,10 +35,10 @@ class Leveling(discord.Cog):
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.guild is None or message.author.bot:
+        if message.guild is None or message.author.bot or message.guild.id != self.bot.config.PARENT_GUILD:
             return
 
-        if message.author.id in self.cache or message.author.bot:
+        if message.author.id in self.cache:
             return
 
         user, _ = await User.get_or_create(discord_id=message.author.id)
