@@ -119,7 +119,14 @@ class ShopItems(Enum):
         3101, "Множник досвіду +0.1x", 1000, "⚗", ItemValue(
             "multipliers", 0.1),
         description="Додає +0.1x до вашого загального множника досвіду. "
-                    "Перевірити можна в /profile"
+                    "- Перевірити можна в /profile"
+    )
+
+    MULTIPLIER_1_0 = ShopItem(
+        3102, "Множник досвіду +1.0x", 9000, "⚗", ItemValue(
+            "multipliers", 1.0),
+        description="Додає +1.0x до вашого загального множника досвіду. "
+                    "- Перевірити можна в /profile"
     )
 
 
