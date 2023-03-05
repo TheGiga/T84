@@ -54,7 +54,7 @@ class InteractiveViews(discord.Cog):
 
         view = discord.ui.View(timeout=None)
         embed = DefaultEmbed()
-        embed.title = '🎯 Ролі режимів'
+        embed.title = '🎯 Авто-ролі'
 
         for role_id in self.bot.config.SELF_ROLES_IDS:
             role = guild.get_role(role_id)
