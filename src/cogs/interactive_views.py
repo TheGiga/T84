@@ -5,11 +5,12 @@ from .. import DefaultEmbed
 
 
 class SelfRoleButton(discord.ui.Button):
-    def __init__(self, role: discord.Role):
+    def __init__(self, role: discord.Role, row: int):
         super().__init__(
             label=role.name,
             style=discord.ButtonStyle.green,
             custom_id=str(role.id),
+            row=row
         )
 
     async def callback(self, interaction: discord.Interaction):
@@ -56,9 +57,11 @@ class InteractiveViews(discord.Cog):
         embed = DefaultEmbed()
         embed.title = '🎯 Авто-ролі'
 
-        for role_id in self.bot.config.SELF_ROLES_IDS:
+        for i, role_id in enumerate(self.bot.config.SELF_ROLES_IDS, start=1):
+            row = (i - 1) // 3
+
             role = guild.get_role(role_id)
-            view.add_item(SelfRoleButton(role))
+            view.add_item(SelfRoleButton(role, row=row))
 
         await channel.send(view=view, embed=embed)
 
@@ -73,9 +76,11 @@ class InteractiveViews(discord.Cog):
 
         guild = await self.bot.parent_guild
 
-        for role_id in self.bot.config.SELF_ROLES_IDS:
+        for i, role_id in enumerate(self.bot.config.SELF_ROLES_IDS, start=1):
+            row = (i - 1) // 3
+
             role = guild.get_role(role_id)
-            view.add_item(SelfRoleButton(role))
+            view.add_item(SelfRoleButton(role, row=row))
 
         self.bot.add_view(view)
 
