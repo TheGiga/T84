@@ -4,7 +4,7 @@ from discord import HTTPException
 from src.achievements import Achievements, Achievement
 from src.base_types import Unique, Inventoriable
 from src.bot import T84, T84ApplicationContext
-from src.models import User, Bank
+from src.models import User
 from src.rewards import leveled_rewards
 
 achievements = [
@@ -31,13 +31,6 @@ class AdminCommands(discord.Cog):
 
     def cog_check(self, ctx: discord.ApplicationContext):
         return ctx.author.id in self.bot.config.ADMINS
-
-    @add.command(name='bank_balance', description='💸 Add money to bank.')
-    async def add_bank_balance(self, ctx: T84ApplicationContext, amount: int):
-        bank = await Bank.get(id=1)
-        await bank.add(amount)
-
-        await ctx.respond("☑ Успішно!", ephemeral=True)
 
     @mass_role.command(name='add', description='✅ Add role to all guild members.')
     async def mass_role_add(self, ctx: T84ApplicationContext, role: discord.Option(discord.Role)):

@@ -15,14 +15,12 @@ cogs: list = [
     "shop",
     "help",
     "admin",
-    "filter",
     "profile",
     "rewards",
     "leveling",
     "gambling",
     "moderation",
     "chat_events",
-    "stat_tracker",
     "achievements",
     "interactive_views"
 ]

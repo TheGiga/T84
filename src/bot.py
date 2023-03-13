@@ -76,7 +76,7 @@ class T84(discord.Bot, ABC):
         embed = discord.Embed()
         embed.colour = discord.Colour.embed_background()
         embed.title = "Команди бота T84"
-        embed.set_image(url="https://i.imgur.com/WozcNGD.png")
+        embed.set_image(url="https://i.imgur.com/K2TqV4K.png")
 
         raw_commands = self.commands.copy()
 
@@ -105,7 +105,7 @@ class T84(discord.Bot, ABC):
             group_embed = discord.Embed()
             group_embed.colour = discord.Colour.embed_background()
             group_embed.title = f'/{group.name}'
-            group_embed.set_image(url="https://i.imgur.com/WozcNGD.png")
+            group_embed.set_image(url="https://i.imgur.com/K2TqV4K.png")
 
             group_commands = list(group.walk_commands())
             description = ''

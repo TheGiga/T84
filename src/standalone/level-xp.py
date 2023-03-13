@@ -2,15 +2,15 @@ from math import sqrt, floor
 import config
 
 
-def level_to_xp(level: int) -> int:
-    xp = level // config.XP_MULTIPLIER
-    xp = xp ** 2
+def level_to_xp(lvl: int) -> int:
+    _xp = lvl // config.XP_MULTIPLIER
+    _xp = _xp ** 2
 
-    return floor(xp)
+    return floor(_xp)
 
 
-def xp_to_level(xp: int) -> int:
-    lvl_raw = config.XP_MULTIPLIER * sqrt(xp)
+def xp_to_level(_xp: int) -> int:
+    lvl_raw = config.XP_MULTIPLIER * sqrt(_xp)
     lvl = floor(lvl_raw)
 
     return lvl

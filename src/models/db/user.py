@@ -31,7 +31,6 @@ class User(Model):
 
     xp = fields.IntField(default=0)
     level = fields.IntField(default=0)
-    message_count = fields.IntField(default=0)
     balance = fields.IntField(default=0)
     premium_balance = fields.IntField(default=0)
 
@@ -210,7 +209,6 @@ class User(Model):
         embed.add_field(name='⚖ Рівень', value=f'`{self.level}`')
         embed.add_field(name='⚗ Досвід', value=f'`{self.xp} ({self.xp_multiplier}x)`')
         embed.add_field(name='🏦 Баланс', value=f'`{self.balance}`')
-        embed.add_field(name='🐦 Повідомлення', value=f'`{self.message_count}`')
         embed.add_field(name='⭐ Досягнення', value=f'`{len(self._achievements)}/{len(Achievements)}`')
         embed.add_field(name='🔢 UID', value=f'`#{self.id}`')
 

@@ -13,7 +13,3 @@ class UniqueIdAlreadyTaken(Exception):
 
 class UniqueItemNotFound(Exception):
     pass
-
-
-class NotEnoughMoneyInBank(Exception):
-    pass

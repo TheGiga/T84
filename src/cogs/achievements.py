@@ -1,7 +1,7 @@
 import discord
 from src import DefaultEmbed
 from src.bot import T84, T84ApplicationContext
-from src.achievements import Achievement, Achievements as AchievementsEnum, MsgCountAchievement
+from src.achievements import Achievement, Achievements as AchievementsEnum
 from src.models import User
 
 
@@ -24,25 +24,15 @@ class Achievements(discord.Cog):
         embed.title = f"Досягнення користувача {discord_instance.display_name}"
         embed.set_thumbnail(url=discord_instance.display_avatar.url)
 
-        msg_achievement = None
-
-        other_achievements = ""
+        achievements = ""
 
         for ach in user.achievements:
-            if type(ach) is MsgCountAchievement:
-                msg_achievement = ach
-
-            else:
-                other_achievements += f"☑️ {ach.name} `({ach.fake_id})`\n"
-
-        if msg_achievement:
-            embed.add_field(name=f'{msg_achievement.name}', value=f'{msg_achievement.description}')
+            achievements += f"☑️ {ach.name} `({ach.fake_id})`\n"
 
         embed.description = f"""
         Кількість досягнень: `{len(user.achievements)}/{len(AchievementsEnum)}`
         
-        {other_achievements}
-        ──────────────────────────
+        {achievements}
         """
 
         await ctx.respond(embed=embed)

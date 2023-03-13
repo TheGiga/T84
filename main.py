@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.DEBUG, format=fmt, filename=file)
 
 import config
 from src import bot_instance, GuildNotWhitelisted, T84ApplicationContext
-from src.models import User, Bank
+from src.models import User
 from src.database import db_init
 from src.base_types import Unique
 
@@ -69,10 +69,6 @@ async def main():
         print(f'✔ Processed Unique instances: {unique_instances}')
 
     await db_init()
-
-    # Create and/or check MAIN bank.
-    await Bank.get_or_create(id=1)
-
     await bot_instance.start(os.getenv("TOKEN"))
 
 

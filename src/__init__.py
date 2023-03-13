@@ -5,7 +5,7 @@ class DefaultEmbed(discord.Embed):
     def __init__(self):
         super().__init__()
 
-        self.colour = discord.Colour.embed_background()
+        self.colour = discord.Colour.from_rgb(43, 45, 49)
         self.set_footer(text="by gigalegit-#0880")
         self.timestamp = discord.utils.utcnow()
 
