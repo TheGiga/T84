@@ -24,12 +24,6 @@ class Achievement(Unique):
         return self.uid - 2000
 
 
-class MsgCountAchievement(Achievement):
-    def __init__(self, uid: int, name: str, description: str, message_count: int, secret: bool = False):
-        self.message_count = message_count
-        super().__init__(uid, name, description, secret)
-
-
 class Achievements(Enum):
     LVL_1 = Achievement(2001, "Це тільки початок!", "Отримайте перший рівень")
 

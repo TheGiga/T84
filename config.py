@@ -20,6 +20,7 @@ cogs: list = [
     "leveling",
     "gambling",
     "moderation",
+    "battlepass",
     "chat_events",
     "achievements",
     "interactive_views"
@@ -47,3 +48,10 @@ SELF_ROLES_IDS: list[int] = [
     1082031852933628045,  # івенти
     1082030848687210526  # записи чітера
 ]
+
+# BP
+CURRENT_BP_SEASON: int = 1
+
+BP_XP_PER_LEVEL: int = 1000
+BP_XP_PER_MESSAGE: int = 25
+BP_PREMIUM_COST: int = 39 # In 💎 Premium currency

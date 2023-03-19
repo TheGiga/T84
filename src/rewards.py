@@ -13,9 +13,10 @@ class Reward(Unique):
 
 
 class RoleReward(Reward):
-    def __init__(self, uid: int, payload: int, hierarchy_previous: int | None):
+    def __init__(self, uid: int, payload: int, hierarchy_previous: int | None = None, inventoriable: bool = False):
         super().__init__(uid, payload)
         self.hierarchy_previous = hierarchy_previous
+        self.inventoriable = inventoriable
 
     async def apply(self, user: User, remove_previous: bool = True):
         discord_instance = await user.get_discord_instance()
@@ -23,7 +24,10 @@ class RoleReward(Reward):
         role = discord_instance.guild.get_role(self.payload)
 
         if role is not None:
-            await discord_instance.add_roles(role, reason=f"Нагорода за рівень.")
+            await discord_instance.add_roles(role, reason=f"Нагорода")
+
+        if self.inventoriable:
+            await user.add_inventory_item(self)
 
         if remove_previous and self.hierarchy_previous is not None:
             previous_role = discord_instance.guild.get_role(self.hierarchy_previous)
@@ -50,7 +54,7 @@ class BalanceReward(Reward):
 
 def get_formatted_reward_string(value) -> str:
     if value.__class__ == RoleReward:
-        return f"`Звання` | 🔻 <@&{value.payload}>"
+        return f"` Роль ` | 🔻 <@&{value.payload}>"
     elif value.__class__ == BalanceReward:
         return f'`Валюта` | 🔸 {value.payload} 💸'
     elif value.__class__ == AchievementReward:
@@ -87,7 +91,7 @@ leveled_rewards: dict = {  # Leveled
 }
 
 for level in range(1, 201):
-    money = level * 50
+    money = level * 20
     try:
         leveled_rewards[level].append(BalanceReward(12000 + level, money))
     except KeyError:

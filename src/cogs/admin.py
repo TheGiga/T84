@@ -2,7 +2,7 @@ import discord
 from discord import HTTPException
 
 from src.achievements import Achievements, Achievement
-from src.base_types import Unique, Inventoriable
+from src.base_types import Unique
 from src.bot import T84, T84ApplicationContext
 from src.models import User
 from src.rewards import leveled_rewards
@@ -12,11 +12,8 @@ achievements = [
     for x in Achievements
 ]
 
-inventoriable_items = [
-    discord.OptionChoice(str(x), x.uid)
-    for x in Unique.get_instances()
-    if issubclass(x.__class__, Inventoriable)
-]
+async def inventory_items(ctx: discord.AutocompleteContext):
+    return [discord.OptionChoice(x.name) for x in Unique.__instances__ if str(x).startswith(ctx.value)]
 
 
 class AdminCommands(discord.Cog):
@@ -75,7 +72,7 @@ class AdminCommands(discord.Cog):
     @add.command(name='inventory_item')
     async def adm_add_inventory_item(
             self, ctx: T84ApplicationContext,
-            item_id: discord.Option(int, name='item', choices=inventoriable_items),
+            item_id: discord.Option(int, name='item', autocomplete=inventory_items),
             member: discord.Option(discord.Member)
     ):
         user, _ = await User.get_or_create(discord_id=member.id)
@@ -115,7 +112,7 @@ class AdminCommands(discord.Cog):
 
         await ctx.respond(content, ephemeral=True)
 
-    @add.command(name='balance', description='🛑 Добавити баланс.')
+    @add.command(name='balance', description='🛑 Додати баланс.')
     async def adm_add_balance(
             self, ctx: T84ApplicationContext, amount: int,
             member: discord.Option(discord.Member), notify_user: bool = False
@@ -126,14 +123,14 @@ class AdminCommands(discord.Cog):
 
         await ctx.respond(content="☑ Успішно!", ephemeral=True)
 
-    @add.command(name='premium_balance', description='🛑 Добавити преміум баланс.')
+    @add.command(name='premium_balance', description='🛑 Додати преміум баланс.')
     async def adm_add_premium_balance(
             self, ctx: T84ApplicationContext, amount: int,
             member: discord.Option(discord.Member), notify_user: bool = False
     ):
         user = await User.get(discord_id=member.id)
 
-        await user.add_balance(amount, notify_user=notify_user)
+        await user.add_premium_balance(amount, notify_user=notify_user)
 
         await ctx.respond(content="☑ Успішно!", ephemeral=True)
 

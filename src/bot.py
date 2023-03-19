@@ -12,7 +12,7 @@ from discord.ext import tasks
 from discord.errors import CheckFailure
 
 import config
-from .errors import GuildNotWhitelisted
+from .errors import GuildNotWhitelisted, NotEnoughPremiumCurrency
 
 from typing import TYPE_CHECKING
 
@@ -74,7 +74,7 @@ class T84(discord.Bot, ABC):
 
     def help_command(self) -> list[discord.Embed]:
         embed = discord.Embed()
-        embed.colour = discord.Colour.embed_background()
+        embed.colour = discord.Colour.from_rgb(43, 45, 49)
         embed.title = "Команди бота T84"
         embed.set_image(url="https://i.imgur.com/K2TqV4K.png")
 
@@ -103,7 +103,7 @@ class T84(discord.Bot, ABC):
             if type(group) is discord.SlashCommandGroup and group.name != 'admin'
         ]:
             group_embed = discord.Embed()
-            group_embed.colour = discord.Colour.embed_background()
+            group_embed.colour = discord.Colour.from_rgb(43, 45, 49)
             group_embed.title = f'/{group.name}'
             group_embed.set_image(url="https://i.imgur.com/K2TqV4K.png")
 
@@ -162,7 +162,7 @@ class T84(discord.Bot, ABC):
             await webhook.send(content=content)
 
     async def on_application_command_error(
-            self, ctx: discord.ApplicationContext, error: discord.ApplicationCommandError
+            self, ctx: T84ApplicationContext, error: discord.ApplicationCommandError
     ):
         if isinstance(error, GuildNotWhitelisted):
             return
@@ -179,6 +179,13 @@ class T84(discord.Bot, ABC):
             await ctx.respond(embed=embed, ephemeral=True)
             return
 
+        elif isinstance(error, NotEnoughPremiumCurrency):
+            return await ctx.respond(
+                f"❌ У вас недостатньо 💎 Преміального балансу.\n"
+                f"> Ваш баланс: `{ctx.user_instance.premium_balance} 💎`",
+                ephemeral=True
+            )
+
         elif isinstance(error, discord.NotFound):
             return
 
@@ -189,8 +196,8 @@ class T84(discord.Bot, ABC):
             )
 
         elif isinstance(error, discord.ApplicationCommandInvokeError):
-            await ctx.respond(
-                "Сталася невідома помилка, я доповів про цей кейс розробнику.\n\n"
+            await ctx.send(
+                "Сталася невідома помилка.\n\n"
                 "Якщо це буде повторюватись - напишіть розробнику: `gigalegit-#0880`\n"
                 "Якщо вам щось терміново потрібно - приєднуйтесь до серверу бота. *(кнопка нижче)*",
                 view=discord.ui.View(
@@ -202,7 +209,6 @@ class T84(discord.Bot, ABC):
                         url="https://github.com/TheGiga/T84",
                     ),
                 ),
-                ephemeral=False
             )
 
         else:

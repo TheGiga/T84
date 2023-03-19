@@ -22,11 +22,3 @@ class Unique:
     @classmethod
     def get_from_id(cls, uid: int) -> Any:
         return cls.__instances__.get(uid)
-
-
-# Basically flags, but I was too lazy to make them somewhat special.
-
-class Inventoriable:
-    def __init__(self, name: str, description: str):
-        self.name = name
-        self.description = description

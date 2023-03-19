@@ -20,7 +20,7 @@ class Gambling(discord.Cog):
     def __init__(self, bot):
         self.bot: T84 = bot
 
-    eco = discord.SlashCommandGroup(name='eco', description='🤑 Команди економіки та ігор.')
+    #eco = discord.SlashCommandGroup(name='eco', description='🤑 Команди економіки та ігор.')
 
     @discord.slash_command(
         name='pay', description='💳 Перевести гроші іншому користувачу.'
@@ -57,11 +57,11 @@ class Gambling(discord.Cog):
         )
 
     # implement Player 2 Player coinflip system, instead of Player 2 Bot
-    @eco.command(
-        name='coinflip',
-        description='🃏 Коінфліп ігровою валютою. При виграші ви отримуєте +100% від ставки.'
-    )
-    @cooldown(1, 3, BucketType.user)
+    #@eco.command(
+    #    name='coinflip',
+    #    description='🃏 Коінфліп ігровою валютою. При виграші ви отримуєте +100% від ставки.'
+    #)
+    #@cooldown(1, 3, BucketType.user)
     async def eco_coinflip(
             self, ctx: T84ApplicationContext,
             amount: discord.Option(int, min_value=100, max_value=100_000),

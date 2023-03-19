@@ -7,14 +7,15 @@ from tortoise import fields
 from tortoise.models import Model
 
 import config
-from src import bot_instance, DefaultEmbed
-from src.base_types import Unique, Inventoriable
-from src.utils import progress_bar
+from src import bot_instance, DefaultEmbed, CouldNotSendDM
+from src.base_types import Unique
+from src.utils import progress_bar, boolean_emoji
 
 from typing import TYPE_CHECKING
+from .battlepassmodel import BattlePassModel
 
 if TYPE_CHECKING:
-    from src.achievements import Achievement, MsgCountAchievement
+    from src.achievements import Achievement
 
 
 class User(Model):
@@ -46,7 +47,7 @@ class User(Model):
         return self.discord_id
 
     def __str__(self):
-        return f"[ User with id {self.discord_id} ]"
+        return f"User({self.id})"
 
     def __repr__(self):
         return f'User({self.discord_id=}, {self.id=})'
@@ -65,7 +66,7 @@ class User(Model):
         return floor(lvl_raw)
 
     @property
-    def inventory(self) -> list[Unique | Inventoriable]:
+    def inventory(self) -> list[Unique]:
         return [
             Unique.get_from_id(uid)
             for uid in self._inventory
@@ -96,14 +97,26 @@ class User(Model):
 
         return round((xp_to_new_level / xp_new_level) * 100)
 
-    async def send_embed(self, embed: discord.Embed) -> None:
+    async def get_battlepass_data(self, season: int = config.CURRENT_BP_SEASON) -> 'BattlePassModel':
+        """Users battlepass data"""
+
+        bp_data, _ = await BattlePassModel.get_or_create(user_id=self.id)
+
+        return bp_data
+
+    async def send(self, embed: discord.Embed = None, content: str = None, view: discord.ui.View = None) -> None:
+        if not embed and not content and not view:
+            return
+
         discord_instance = await self.get_discord_instance()
 
         try:
-            await discord_instance.send(embed=embed)
-        except discord.Forbidden:
-            logging.info(f"Couldn't send message to {discord_instance.id}, most likely due to closed DM's.")
-            pass
+            await discord_instance.send(content=content, embed=embed, view=view)
+        except discord.HTTPException:
+            msg = f"Couldn't send message to {discord_instance.id}, most likely due to closed DM's."
+
+            logging.info(msg)
+            raise CouldNotSendDM(msg)
 
     async def add_inventory_item(self, item: Unique) -> None:
         """
@@ -117,7 +130,7 @@ class User(Model):
         if item.uid in inventory:
             return
 
-        if not issubclass(item.__class__, Inventoriable):
+        if not issubclass(item.__class__, Unique):
             return
 
         inventory.append(item.uid)
@@ -135,10 +148,10 @@ class User(Model):
 
             embed.set_author(name='ДТВУ', url=config.PG_INVITE)
             embed.description = f"Вам нараховано 💸 **Баланс** у розмірі `{amount}`" \
-                                f"\n{additional_message if additional_message is not None else ''}"
+                                f"\n{additional_message if additional_message else ''}"
             embed.colour = discord.Colour.gold()
             try:
-                await self.send_embed(embed)
+                await self.send(embed)
             except discord.HTTPException:
                 pass
 
@@ -154,12 +167,12 @@ class User(Model):
             embed.colour = discord.Colour.blue()
 
             try:
-                await self.send_embed(embed)
+                await self.send(embed)
             except discord.HTTPException:
                 pass
 
     async def add_achievement(
-            self, achievement: 'Achievement' or 'MsgCountAchievement', notify_user: bool = False
+            self, achievement: 'Achievement', notify_user: bool = False
     ) -> None:
         current_achievements = list(self._achievements)
         if achievement.uid in current_achievements:
@@ -179,7 +192,7 @@ class User(Model):
 
             embed.set_footer(text=f'Код досягнення: {achievement.fake_id}')
 
-            await self.send_embed(embed)
+            await self.send(embed=embed)
 
     async def add_xp(self, amount: int, notify_user: bool = False) -> None:
         self.xp += amount
@@ -192,7 +205,7 @@ class User(Model):
             embed.description = f"Вам нараховано ⚗ **XP** у розмірі `{amount}`"
             embed.colour = discord.Colour.green()
 
-            await self.send_embed(embed)
+            await self.send(embed)
 
     # Applies multiple rewards to user
     async def apply_rewards(self, rewards: tuple):
@@ -202,6 +215,7 @@ class User(Model):
     async def get_profile_embed(self) -> discord.Embed:
         from src.achievements import Achievements
         member = await self.get_discord_instance()
+        bp = await self.get_battlepass_data()
 
         embed = DefaultEmbed()
         embed.title = f"**Профіль користувача {member.display_name}**"
@@ -209,6 +223,7 @@ class User(Model):
         embed.add_field(name='⚖ Рівень', value=f'`{self.level}`')
         embed.add_field(name='⚗ Досвід', value=f'`{self.xp} ({self.xp_multiplier}x)`')
         embed.add_field(name='🏦 Баланс', value=f'`{self.balance}`')
+        embed.add_field(name="♾️ Рівень BP", value=f'`{bp.level}`')
         embed.add_field(name='⭐ Досягнення', value=f'`{len(self._achievements)}/{len(Achievements)}`')
         embed.add_field(name='🔢 UID', value=f'`#{self.id}`')
 
@@ -223,6 +238,42 @@ class User(Model):
                 """
 
         return embed
+
+    async def get_battlepass_embed(self, season: int = config.CURRENT_BP_SEASON) -> discord.Embed:
+        from src import BattlePassEnum
+
+        bp = await self.get_battlepass_data(season=season)
+        embed = DefaultEmbed()
+
+        if bp.premium:
+            embed.colour = discord.Colour.blurple()
+
+        next_rewards = BattlePassEnum.get_by_level(bp.level+1)
+
+        if next_rewards.paid and not bp.premium:
+            next_rewards = None
+
+        percent = (bp.xp / ((bp.level + 1) * config.BP_XP_PER_LEVEL)) * 100
+        progress = progress_bar(percent)
+
+        embed.title = f'📔 Баттл-Пасс сезон #{config.CURRENT_BP_SEASON}'
+
+        embed.description = f"""        
+        > ```{bp.level} {progress} {bp.level+1}``` Прогрес до наступного рівню: `{bp.xp}/{(bp.level+1) 
+                                                                                          * config.BP_XP_PER_LEVEL}`
+        
+        {'⭐' if next_rewards.paid else '🔹'} **Нагороди наступного рівню:**
+        {next_rewards if next_rewards else '*Нагороди наступного рівню тільки преміальні*'}
+        """
+
+        embed.add_field(name="🔘 Досвід BP", value=f'`{bp.xp}`')
+        embed.add_field(name="♾️ Рівень BP", value=f'`{bp.level}`')
+        embed.add_field(name="💎 Преміум", value=boolean_emoji(bp.premium))
+
+        embed.set_thumbnail(url='https://i.imgur.com/BapZMjf.png')
+
+        return embed
+
 
     async def get_discord_instance(self, preload_guild: discord.Guild = None) -> discord.Member | None:
         if preload_guild is None:

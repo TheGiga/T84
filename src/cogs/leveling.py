@@ -62,7 +62,6 @@ class Leveling(discord.Cog):
 
             embed.add_field(name='⚖ Рівень', value=f"`{lvl}`")
             embed.add_field(name='⚗ Досвід', value=f'`{user.xp}`')
-            embed.add_field(name='🐦 Повідомлення', value=f'`{user.message_count}`')
 
             try:
                 await message.reply(
