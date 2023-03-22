@@ -1,4 +1,3 @@
-import logging
 import discord
 
 
@@ -10,11 +9,6 @@ class NotEnoughPremiumCurrency(discord.ApplicationCommandError):
 
 class MaxMultiplierLimit(discord.ApplicationCommandError):
     pass
-
-class UniqueIdAlreadyTaken(Exception):
-    def __init__(self, uid):
-        logging.critical(f"Unique class with UID {uid} already registered!")
-
 
 class UniqueItemNotFound(Exception):
     pass

@@ -25,10 +25,10 @@ class Gambling(discord.Cog):
     @discord.slash_command(
         name='pay', description='💳 Перевести гроші іншому користувачу.'
     )
-    @cooldown(1, 20, BucketType.user)
+    @cooldown(1, 10, BucketType.user)
     async def eco_pay(
             self, ctx: T84ApplicationContext, member: discord.Option(discord.Member), amount: discord.Option(
-                int, min_value=10, max_value=100_000
+                int, min_value=1, max_value=100_000
             )
     ):
         await ctx.defer(ephemeral=True)

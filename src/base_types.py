@@ -1,24 +1,21 @@
+import uuid
 from typing import Any
-from src import UniqueIdAlreadyTaken
-
 
 class Unique:
-    __instances__: dict[int: Any] = {}
+    __instances__: dict[str: Any] = {}
 
-    def __init__(self, uid: int, cls: Any):
-        if uid in self.__instances__:
-            raise UniqueIdAlreadyTaken(uid)
+    def __init__(self, cls: Any, key: str = None):
 
-        self.uid = uid
-        self.__instances__[uid] = cls
+        if not key:
+            key = str(uuid.uuid4())
 
-    @classmethod
-    def get_instances(cls) -> list:
-        """
-        :return: a list of Unique instances
-        """
-        return list(cls.__instances__.values())
+        if key in self.__instances__:
+            print(f"⚠ Key {key} is taken, changing to random value.")
+            key = str(uuid.uuid4())
+
+        self.key = key
+        self.__instances__[key] = cls
 
     @classmethod
-    def get_from_id(cls, uid: int) -> Any:
-        return cls.__instances__.get(uid)
+    def get_from_key(cls, key: str) -> Any | None:
+        return cls.__instances__.get(key)

@@ -8,18 +8,12 @@ from src.rewards import RoleReward, AchievementReward, BalanceReward
 if TYPE_CHECKING:
     from src.models import User
 
-level_sequence = 0
-
 class BattlePassItem:
     def __init__(
             self, name: str, description: str | None, reward: Union['RoleReward', 'AchievementReward', 'BalanceReward']
     ):
         self.name = name
         self.description = description
-
-        if type(reward) is RoleReward:
-            reward.inventoriable = True
-
         self.reward = reward
 
     def __repr__(self):
@@ -59,32 +53,32 @@ BPIL = BattlePassItemList
 
 class BattlePassEnum(Enum):
     PAID_INSTANT = BPIL(
-        BPI("🔻 Роль | Преміум Battle-pass #1", None, RoleReward(20001, 1049431166442279074)),
+        BPI("🔻 Роль | Преміум Battle-pass #1", None, RoleReward(1049431166442279074)),
         paid=True, level=0
     )
 
     LVL_1 = BPIL(
-        BPI("🔸 Валюта | 1000 💸", None, BalanceReward(20002, 1000)),
+        BPI("🔸 Валюта | 1000 💸", None, BalanceReward(1000)),
         paid=False, level=1
     )
 
     LVL_2 = BPIL(
-        BPI("🔸 Валюта | 1000 💸", None, BalanceReward(20003, 1000)),
+        BPI("🔸 Валюта | 1000 💸", None, BalanceReward(1000)),
         paid=True, level=2
     )
 
     LVL_3 = BPIL(
-        BPI("🔸 Валюта | 1000 💸", None, BalanceReward(20004, 1000)),
+        BPI("🔸 Валюта | 1000 💸", None, BalanceReward(1000)),
         paid=True, level=3
     )
 
     LVL_4 = BPIL(
-        BPI("🔸 Валюта | 1000 💸", None, BalanceReward(20005, 1000)),
+        BPI("🔸 Валюта | 1000 💸", None, BalanceReward(1000)),
         paid=True, level=4
     )
 
     LVL_5 = BPIL(
-        BPI("🔸 Валюта | 1000 💸", None, BalanceReward(20006, 1000)),
+        BPI("🔸 Валюта | 1000 💸", None, BalanceReward(1000)),
         paid=False, level=5
     )
 

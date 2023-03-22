@@ -4,6 +4,12 @@ from src.bot import T84, T84ApplicationContext
 from src.achievements import Achievement, Achievements as AchievementsEnum
 from src.models import User
 
+viewable_achievements = [
+    discord.OptionChoice(x.value.name, x.value.key)
+    for x in AchievementsEnum
+    if not x.value.secret
+]
+
 
 class Achievements(discord.Cog):
     def __init__(self, bot: T84):
@@ -27,7 +33,7 @@ class Achievements(discord.Cog):
         achievements = ""
 
         for ach in user.achievements:
-            achievements += f"☑️ {ach.name} `({ach.fake_id})`\n"
+            achievements += f"☑️ {ach.name}\n"
 
         embed.description = f"""
         Кількість досягнень: `{len(user.achievements)}/{len(AchievementsEnum)}`
@@ -36,36 +42,23 @@ class Achievements(discord.Cog):
         """
 
         await ctx.respond(embed=embed)
-        # await user.add_achievement(achievement=AchievementsEnum.get_from_id(2008), notify_user=True)
 
     @discord.slash_command(name='achievement', description='⭐ Подивитися інформацію про досягнення.')
     async def achievement(
-            self, ctx: T84ApplicationContext, identifier: discord.Option(
-                int, name='id', description="Номер досягнення. Усі досягнення пронумеровані по порядку.",
-                min_value=1, max_value=len(AchievementsEnum)
+            self, ctx: T84ApplicationContext, achievement_key: discord.Option(
+                str, choices=viewable_achievements, name='achievement',
+                description="Тут можна подивитися інформацію про незасекречені досягнення."
             )
     ):
-        # +2000 because I use fake achievement ID's on frontend, so people can easily manage them.
-        # 1, 2, 3 is better than 2001, 2002, 2003... right?
-        achievement: Achievement | None = Achievement.get_from_id(identifier+2000)
+        achievement: Achievement | None = Achievement.get_from_key(achievement_key)
 
         if achievement is None:
             return await ctx.respond(content="❌ Досягнення з таким номером не знайдено!", ephemeral=True)
 
-        if achievement is Achievement.get_from_id(2011):
-            user = await User.get(discord_id=ctx.author.id)
-            await user.add_achievement(achievement, notify_user=True)
-
-        if achievement.secret:
-            embed = DefaultEmbed()
-            embed.title = "???"
-            embed.description = "*Це досягнення засекречене!*"
-            embed.colour = discord.Colour.red()
-
-            return await ctx.respond(embed=embed)
+        await ctx.user_instance.add_achievement(Achievement.get_from_key("ach_interested"), notify_user=True)
 
         embed = DefaultEmbed()
-        embed.colour = discord.Colour.blurple()
+        embed.colour = discord.Colour.dark_blue()
 
         embed.title = achievement.name
 
@@ -84,15 +77,15 @@ class Achievements(discord.Cog):
         match reaction.emoji:
             case "🍉":
                 user, _ = await User.get_or_create(discord_id=user.id)
-                await user.add_achievement(Achievement.get_from_id(2009), notify_user=True)
+                await user.add_achievement(Achievement.get_from_key("ach_watermelon"), notify_user=True)
 
             case "💣":
                 user, _ = await User.get_or_create(discord_id=user.id)
-                await user.add_achievement(Achievement.get_from_id(2014), notify_user=True)
+                await user.add_achievement(Achievement.get_from_key("ach_donbass"), notify_user=True)
 
             case "💀":
                 user, _ = await User.get_or_create(discord_id=user.id)
-                await user.add_achievement(Achievement.get_from_id(2008), notify_user=True)
+                await user.add_achievement(Achievement.get_from_key("ach_skull"), notify_user=True)
 
 
 def setup(bot: T84):

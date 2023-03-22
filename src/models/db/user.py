@@ -7,7 +7,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 import config
-from src import bot_instance, DefaultEmbed, CouldNotSendDM
+from src import bot_instance, DefaultEmbed
 from src.base_types import Unique
 from src.utils import progress_bar, boolean_emoji
 
@@ -68,15 +68,15 @@ class User(Model):
     @property
     def inventory(self) -> list[Unique]:
         return [
-            Unique.get_from_id(uid)
-            for uid in self._inventory
+            Unique.get_from_key(key)
+            for key in self._inventory
         ]
 
     @property
     def achievements(self) -> list['Achievement']:
         return [
-            Unique.get_from_id(uid)
-            for uid in self._achievements
+            Unique.get_from_key(key)
+            for key in self._achievements
         ]
 
     @property
@@ -114,9 +114,7 @@ class User(Model):
             await discord_instance.send(content=content, embed=embed, view=view)
         except discord.HTTPException:
             msg = f"Couldn't send message to {discord_instance.id}, most likely due to closed DM's."
-
             logging.info(msg)
-            raise CouldNotSendDM(msg)
 
     async def add_inventory_item(self, item: Unique) -> None:
         """
@@ -127,13 +125,13 @@ class User(Model):
         """
         inventory = list(self._inventory)
 
-        if item.uid in inventory:
+        if item.key in inventory:
             return
 
         if not issubclass(item.__class__, Unique):
             return
 
-        inventory.append(item.uid)
+        inventory.append(item.key)
         self._inventory = inventory
         await self.save()
 
@@ -175,10 +173,10 @@ class User(Model):
             self, achievement: 'Achievement', notify_user: bool = False
     ) -> None:
         current_achievements = list(self._achievements)
-        if achievement.uid in current_achievements:
+        if achievement.key in current_achievements:
             return
 
-        current_achievements.append(achievement.uid)
+        current_achievements.append(achievement.key)
         self._achievements = current_achievements
         await self.save()
 
@@ -190,7 +188,7 @@ class User(Model):
             embed.description = f'{achievement.description}'
             embed.colour = discord.Colour.blurple()
 
-            embed.set_footer(text=f'Код досягнення: {achievement.fake_id}')
+            embed.set_footer(text=f'Код досягнення: {achievement.key}')
 
             await self.send(embed=embed)
 

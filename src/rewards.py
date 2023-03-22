@@ -4,17 +4,19 @@ from src.models import User
 
 
 class Reward(Unique):
-    def __init__(self, uid: int, payload: int):
+    def __init__(self, payload: int | str, key: str = None):
         self.payload = payload
-        super().__init__(uid, self)
+        super().__init__(cls=self, key=key)
 
     def __repr__(self):
         return get_formatted_reward_string(self)
 
 
 class RoleReward(Reward):
-    def __init__(self, uid: int, payload: int, hierarchy_previous: int | None = None, inventoriable: bool = False):
-        super().__init__(uid, payload)
+    def __init__(
+            self, payload: int, hierarchy_previous: int | None = None, inventoriable: bool = False, key: str = None
+    ):
+        super().__init__(payload, key)
         self.hierarchy_previous = hierarchy_previous
         self.inventoriable = inventoriable
 
@@ -37,16 +39,16 @@ class RoleReward(Reward):
 
 
 class AchievementReward(Reward):
-    def __init__(self, uid: int, payload: int):
-        super().__init__(uid, payload)
+    def __init__(self, payload: str, key: str = None):
+        super().__init__(payload, key)
 
     async def apply(self, user: User):
-        await user.add_achievement(achievement=Achievement.get_from_id(self.payload), notify_user=True)
+        await user.add_achievement(achievement=Achievement.get_from_key(self.payload), notify_user=True)
 
 
 class BalanceReward(Reward):
-    def __init__(self, uid: int, payload: int):
-        super().__init__(uid, payload)
+    def __init__(self, payload: int, key: str = None):
+        super().__init__(payload, key)
 
     async def apply(self, user: User):
         await user.add_balance(amount=self.payload)
@@ -58,41 +60,41 @@ def get_formatted_reward_string(value) -> str:
     elif value.__class__ == BalanceReward:
         return f'`Валюта` | 🔸 {value.payload} 💸'
     elif value.__class__ == AchievementReward:
-        return f'`Ачівка` | {str(Unique.get_from_id(value.payload))}'
+        return f'`Ачівка` | {str(Unique.get_from_key(value.payload))}'
     else:
         return "Unknown Type"
 
 
 leveled_rewards: dict = {  # Leveled
     1: [
-        RoleReward(9000, 1030995469163311186, None),
-        AchievementReward(9001, 2001),
-        BalanceReward(12900, 100)
+        RoleReward(1030995469163311186, None),
+        AchievementReward("ach_lvl1"),
+        BalanceReward(100)
     ],  # Солдат
-    5: [RoleReward(9002, 1075846937103843329, 1030995469163311186)],  # Старший Солдат
-    10: [RoleReward(9003, 1030996020747845662, 1075846937103843329)],  # Сержант
-    15: [RoleReward(9004, 1075846978308681798, 1030996020747845662)],  # Штаб-Сержант
-    20: [RoleReward(9005, 1030996194677227580, 1075846978308681798)],  # Лейтенант
-    25: [RoleReward(9006, 1075847172207169647, 1030996194677227580)],  # Старший Лейтенант
-    30: [RoleReward(9007, 1031205846073495552, 1075847172207169647)],  # Капітан
-    40: [RoleReward(9008, 1036956349080277042, 1031205846073495552)],  # Підполковник
+    5: [RoleReward(1075846937103843329, 1030995469163311186)],  # Старший Солдат
+    10: [RoleReward(1030996020747845662, 1075846937103843329)],  # Сержант
+    15: [RoleReward(1075846978308681798, 1030996020747845662)],  # Штаб-Сержант
+    20: [RoleReward(1030996194677227580, 1075846978308681798)],  # Лейтенант
+    25: [RoleReward(1075847172207169647, 1030996194677227580)],  # Старший Лейтенант
+    30: [RoleReward(1031205846073495552, 1075847172207169647)],  # Капітан
+    40: [RoleReward(1036956349080277042, 1031205846073495552)],  # Підполковник
     50: [
-        RoleReward(9009, 1031206572363350026, 1036956349080277042),
-        AchievementReward(9010, 2007)
+        RoleReward(1031206572363350026, 1036956349080277042),
+        AchievementReward("ach_lvl50")
     ],  # Полковник
-    60: [RoleReward(9011, 1031206146687639592, 1031206572363350026)],  # Генерал-Майор
-    70: [RoleReward(9012, 1075847336770682900, 1031206146687639592)],  # Генерал-Лейтенант
-    80: [RoleReward(9013, 1075847306156462221, 1075847336770682900)],  # Генерал-Полковник
-    90: [RoleReward(9014, 1075847339325001868, 1075847306156462221)],  # Генерал Армії
+    60: [RoleReward(1031206146687639592, 1031206572363350026)],  # Генерал-Майор
+    70: [RoleReward(1075847336770682900, 1031206146687639592)],  # Генерал-Лейтенант
+    80: [RoleReward(1075847306156462221, 1075847336770682900)],  # Генерал-Полковник
+    90: [RoleReward(1075847339325001868, 1075847306156462221)],  # Генерал Армії
     100: [
-        RoleReward(9015, 1036956817516933120, 1075847339325001868),
-        AchievementReward(9016, 2010)
+        RoleReward(1036956817516933120, 1075847339325001868),
+        AchievementReward("ach_lvl100")
     ]  # Головнокомандуючий
 }
 
 for level in range(1, 201):
     money = level * 20
     try:
-        leveled_rewards[level].append(BalanceReward(12000 + level, money))
+        leveled_rewards[level].append(BalanceReward(money))
     except KeyError:
-        leveled_rewards[level] = [BalanceReward(12000 + level, money)]
+        leveled_rewards[level] = [BalanceReward(money)]

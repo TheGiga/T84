@@ -12,7 +12,6 @@ PG_INVITE: str = "https://discord.gg/8GHx6ak8cs"
 ADMINS: list[int] = [352062534469156864, 690237585372610560]
 
 cogs: list = [
-    "shop",
     "help",
     "admin",
     "profile",

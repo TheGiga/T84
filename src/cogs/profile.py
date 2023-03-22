@@ -26,9 +26,12 @@ class Profile(discord.Cog):
 
     @discord.slash_command(name='balance', description='👤 Перевірити свій баланс.')
     async def balance(self, ctx: T84ApplicationContext):
-        await ctx.user_instance.add_achievement(Achievement.get_from_id(2013), notify_user=True)
+        await ctx.user_instance.add_achievement(Achievement.get_from_key("ach_balance"), notify_user=True)
 
-        await ctx.respond(f"Ваш баланс: **{ctx.user_instance.balance}** 💸", ephemeral=True)
+        await ctx.respond(
+            f"Ваш баланс: **{ctx.user_instance.balance}** 💸 | **{ctx.user_instance.premium_balance}** 💎",
+            ephemeral=True
+        )
 
     @discord.slash_command(name='inventory', description='👤 Переглянути свій інвентар.')
     async def inventory(
@@ -43,7 +46,7 @@ class Profile(discord.Cog):
 
         desc = ""
         for item in user_instance.inventory:
-            desc += f"**{item}**\n\n" # type: ignore
+            desc += f"**{item}**\n\n"
 
         embed.description = desc if desc else "*Пусто* 😢"
 
