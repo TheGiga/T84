@@ -13,14 +13,14 @@ class Reason:
 class Reasons(Enum):
     RUSSIAN_PROPAGANDA = Reason(1, "Проросійські терміни / символіка / пропаганда.", 'ban', td(days=365))
     OPPRESSION_BY_LANGUAGE = Reason(2, "Притискання за мовною ознакою", 'timeout', td(hours=2))
-    UNVERIFIED_INFORMATION_SOURCES = Reason(3, "Публікування інформації з неперевірених джерел.", 'timeout',
-                                            td(hours=24))
-    CONFLICTIVE_BEHAVIOUR = Reason(4, "Конфліктна поведінка", 'timeout', td(hours=6))
-    HUGE_INSULTS = Reason(5, 'Приниження людей, факт неадекватного спілкування', 'timeout',
-                          td(hours=6))
-    NSFW = Reason(6, 'NSFW (Not Safe for Work) контент', 'timeout', td(hours=24))
-    FLOOD = Reason(7, 'Флуд', 'timeout', td(minutes=30))
-    ADVERTISING = Reason(8, 'Реклама', 'timeout', td(hours=6))
+    CONFLICTIVE_BEHAVIOUR = Reason(3,"Конфлікти та провокаційні дії що ведуть до них", 'timeout', td(hours=6))
+    INSULTS = Reason(4, 'Важкі образи по відношенню до учасників серверу.', 'timeout', td(hours=3))
+    NSFW = Reason(5, 'Розповсюдження шокуючого контенту.', 'timeout', td(hours=12))
+    SPAM_FLOOD = Reason(
+        6, 'Спам/флуд та інші повідомлення що не несуть у собі смислового навантаження.', 'timeout', td(minutes=30)
+    )
+    ADS = Reason(7, "Реклама сторонніх сервесів/діскорд каналів/чатів, що не пов'язанні з ДТВУ.", 'timeout', td(hours=6))
+    BAN_EVADING = Reason(8, "Обходження покарань за допомогою іншого аккаунта (твінка).", 'ban', td(days=365))
 
     @classmethod
     def get_from_id(cls, _id: int, /) -> Reason:

@@ -1,4 +1,5 @@
 from .user import User
-from .battlepassmodel import BattlePassModel
+from .bp import BattlePassModel
+from .booster import XPBooster
 
-__models__ = [User, BattlePassModel]
+__models__ = [User, BattlePassModel, XPBooster]

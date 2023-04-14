@@ -3,9 +3,10 @@ from typing import Any
 from discord.ext import tasks
 from tortoise.queryset import QuerySet
 
-from src.bot import T84
+from src.bot import T84, T84ApplicationContext
 from src.models import User
 from src import DefaultEmbed
+from src.rewards import Reward, leveled_rewards, get_formatted_reward_string
 
 
 class Leveling(discord.Cog):
@@ -15,7 +16,7 @@ class Leveling(discord.Cog):
         self.caching_loop.start()
 
     @discord.slash_command(name='top', description='🔮 Список лідерів по рівню.')
-    async def top(self, ctx: discord.ApplicationContext):
+    async def top(self, ctx: T84ApplicationContext):
         await ctx.defer()
 
         query_set: list[User, Any] = await QuerySet(User).order_by('-xp').limit(10)
@@ -73,6 +74,31 @@ class Leveling(discord.Cog):
                 pass
 
         self.cache.append(user.discord_id)
+
+    @discord.slash_command(name='rewards', description='🔮 Список нагород для вказаного рівню.')
+    async def rewards(
+            self, ctx: T84ApplicationContext, level: discord.Option(int, description='Рівень')
+    ):
+        rewards: list[Reward] = leveled_rewards.get(level)
+
+        embed = DefaultEmbed()
+
+        if rewards is None:
+            embed.title = "???"
+            embed.description = "❌ На цьому рівні немає нагород."
+
+            return await ctx.respond(embed=embed)
+
+        embed.title = f"Нагороди {level}-ого рівню"
+
+        desc = ""
+
+        for reward in rewards:
+            desc += f"{get_formatted_reward_string(reward)}\n"
+
+        embed.description = desc
+
+        await ctx.respond(embed=embed)
 
     @tasks.loop(minutes=2)
     async def caching_loop(self):

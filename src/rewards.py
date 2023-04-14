@@ -62,7 +62,7 @@ def get_formatted_reward_string(value) -> str:
     elif value.__class__ == AchievementReward:
         return f'`Ачівка` | {str(Unique.get_from_key(value.payload))}'
     else:
-        return "Unknown Type"
+        return f"` Айтем ` | {str(value.payload)}"
 
 
 leveled_rewards: dict = {  # Leveled

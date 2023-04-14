@@ -1,3 +1,4 @@
+import datetime
 import logging
 from math import sqrt, floor
 
@@ -12,10 +13,11 @@ from src.base_types import Unique
 from src.utils import progress_bar, boolean_emoji
 
 from typing import TYPE_CHECKING
-from .battlepassmodel import BattlePassModel
+from .bp import BattlePassModel
 
 if TYPE_CHECKING:
     from src.achievements import Achievement
+    from src.models import XPBooster
 
 
 class User(Model):
@@ -38,7 +40,7 @@ class User(Model):
     # Storage-able
 
     _achievements = fields.JSONField(source_field="achievements", default=[])
-    _inventory = fields.JSONField(source_field="inventory", default=[])
+    _inventory = fields.JSONField(source_field="inventory", default=[]) # might be unnecessary
 
     # Other
     xp_multiplier = fields.FloatField(default=1.0)
@@ -96,6 +98,14 @@ class User(Model):
         xp_new_level = self.level_to_xp(self.level + 1) - self.level_to_xp(self.level)
 
         return round((xp_to_new_level / xp_new_level) * 100)
+
+    async def apply_xp_booster(self, power: float, duration: datetime.timedelta) -> 'XPBooster':
+        from src.models import XPBooster
+        valid_until = datetime.datetime.utcnow() + duration
+        booster = await XPBooster.create(user_id=self.id, power=power, valid_until=valid_until)
+        await booster.apply()
+
+        return booster
 
     async def get_battlepass_data(self, season: int = config.CURRENT_BP_SEASON) -> 'BattlePassModel':
         """Users battlepass data"""
@@ -206,6 +216,7 @@ class User(Model):
             await self.send(embed)
 
     # Applies multiple rewards to user
+    # Edit: i don't fucking know why i implemented this like, well, that
     async def apply_rewards(self, rewards: tuple):
         for r in rewards:
             await r.apply(self)
@@ -218,8 +229,8 @@ class User(Model):
         embed = DefaultEmbed()
         embed.title = f"**Профіль користувача {member.display_name}**"
 
-        embed.add_field(name='⚖ Рівень', value=f'`{self.level}`')
-        embed.add_field(name='⚗ Досвід', value=f'`{self.xp} ({self.xp_multiplier}x)`')
+        embed.add_field(name='⚖️ Рівень', value=f'`{self.level}`')
+        embed.add_field(name='⚗️ Досвід', value=f'`{self.xp} ({self.xp_multiplier}x)`')
         embed.add_field(name='🏦 Баланс', value=f'`{self.balance}`')
         embed.add_field(name="♾️ Рівень BP", value=f'`{bp.level}`')
         embed.add_field(name='⭐ Досягнення', value=f'`{len(self._achievements)}/{len(Achievements)}`')

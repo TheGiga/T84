@@ -38,13 +38,10 @@ class BattlePassModel(Model):
             item_list = BattlePassEnum.get_by_level(self.level)
             user = await self.get_user()
 
-            if item_list.paid:
-                if not self.premium:
-                    item_list = None
-                else:
-                    await item_list.apply_all(user)
+            if item_list.paid and not self.premium:
+                item_list = None
             else:
-                await item_list.apply_all(user)
+                await item_list.apply_all(user=user)
 
             return True, item_list
 

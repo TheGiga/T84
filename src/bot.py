@@ -140,7 +140,7 @@ class T84(discord.Bot, ABC):
         print(f"✔ Bot is ready, logged in as {self.user}")
 
     @staticmethod
-    async def send_critical_log(message: str, level: WARNING | ERROR | CRITICAL) -> None:
+    async def send_critical_log(message: str, level: WARNING | ERROR | CRITICAL = WARNING) -> None:
         """
         Message will be forwarded to local logging module + filesystem
         and also sent out via discord webhook if needed.
