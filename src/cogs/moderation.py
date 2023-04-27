@@ -73,12 +73,12 @@ class Moderation(discord.Cog):
         )
 
         await ctx.respond(
-            content=f'☑ Користувач {member.mention} успішно покараний за причиною: `{enum_reason.name}`',
+            content=f'☑️ Користувач {member.mention} успішно покараний за причиною: `{enum_reason.name}`',
             ephemeral=True
         )
 
         await ctx.send(
-            f'⚠ **Користувача {member.mention} було покарано модератором {ctx.author.mention}.**\n'
+            f'⚠️ **Користувача {member.mention} було покарано модератором {ctx.author.mention}.**\n'
             f'> Причина: `{enum_reason.name}` ||Термін: `{enum_reason.duration}`||'
         )
 

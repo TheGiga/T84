@@ -44,7 +44,7 @@ class AdminCommands(discord.Cog):
 
         await user.add_inventory_item(item)
 
-        await ctx.respond("☑ Успішно.", ephemeral=True)
+        await ctx.respond("☑️ Успішно.", ephemeral=True)
 
     @recalculate.command(name='rewards', description='♻')
     async def adm_recalculate_rewards(
@@ -68,7 +68,7 @@ class AdminCommands(discord.Cog):
 
             await user.apply_rewards(rewards_to_apply)
 
-        content = f"☑ Успішно, видані нагороди: ```py\n{overall_applied_rewards}```"
+        content = f"☑️ Успішно, видані нагороди: ```py\n{overall_applied_rewards}```"
 
         if reward_type == "balance":
             content += f'\n\nУсього: `{sum(x.payload for x in overall_applied_rewards)}` 💸'
@@ -84,7 +84,7 @@ class AdminCommands(discord.Cog):
 
         await user.add_balance(amount, notify_user=notify_user)
 
-        await ctx.respond(content="☑ Успішно!", ephemeral=True)
+        await ctx.respond(content="☑️ Успішно!", ephemeral=True)
 
     @add.command(name='premium_balance', description='🛑 Додати преміум баланс.')
     async def adm_add_premium_balance(
@@ -95,7 +95,7 @@ class AdminCommands(discord.Cog):
 
         await user.add_premium_balance(amount, notify_user=notify_user)
 
-        await ctx.respond(content="☑ Успішно!", ephemeral=True)
+        await ctx.respond(content="☑️ Успішно!", ephemeral=True)
 
     @add.command(name='stored_role', description='🛑 Додати перемикаєму роль.')
     async def adm_add_stored_role(
@@ -106,7 +106,7 @@ class AdminCommands(discord.Cog):
 
         await user.add_stored_role(int(role))
 
-        await ctx.respond("☑ Успішно", ephemeral=True)
+        await ctx.respond("☑️ Успішно", ephemeral=True)
 
     @add.command(name='achievement', description='🛑 Додати досягнення.')
     async def adm_add_achievement(
@@ -117,7 +117,7 @@ class AdminCommands(discord.Cog):
 
         await user.add_achievement(Achievement.get_from_key(achievement), notify_user=notify_user)
 
-        await ctx.respond("☑ Успішно", ephemeral=True)
+        await ctx.respond("☑️ Успішно", ephemeral=True)
 
 
 def setup(bot: T84):

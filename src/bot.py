@@ -185,7 +185,7 @@ class T84(discord.Bot, ABC):
             return await ctx.respond(
                 f"❌ У вас недостатньо 💎 Преміального балансу.\n"
                 f"> Ваш баланс: `{ctx.user_instance.premium_balance} 💎`\n\n"
-                f"Інформація щодо преміальну валюту <#{self.config.DONATE_INFO_CHANNEL}>",
+                f"Інформація щодо преміальної валюти <#{self.config.DONATE_INFO_CHANNEL}>",
                 ephemeral=True
             )
 
