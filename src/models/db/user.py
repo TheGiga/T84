@@ -14,6 +14,7 @@ from src.utils import progress_bar, boolean_emoji
 
 from typing import TYPE_CHECKING
 from .bp import BattlePassModel
+from ...bot import T84
 
 if TYPE_CHECKING:
     from src.achievements import Achievement
@@ -41,6 +42,7 @@ class User(Model):
 
     _achievements = fields.JSONField(source_field="achievements", default=[])
     _inventory = fields.JSONField(source_field="inventory", default=[]) # might be unnecessary
+    _roles = fields.JSONField(source_field="roles", default=[])
 
     # Other
     xp_multiplier = fields.FloatField(default=1.0)
@@ -98,6 +100,48 @@ class User(Model):
         xp_new_level = self.level_to_xp(self.level + 1) - self.level_to_xp(self.level)
 
         return round((xp_to_new_level / xp_new_level) * 100)
+
+
+    async def get_stored_roles(self) -> list[discord.Role]:
+        discord_instance = await self.get_discord_instance()
+        guild = discord_instance.guild
+
+        to_return = []
+
+        for role_id in self._roles:
+            role = guild.get_role(role_id)
+
+            if role is None:
+                await T84.send_critical_log(
+                    f'User.get_stored_roles | The role {role_id} appears to be None.', level=logging.ERROR
+                )
+                continue
+
+            to_return.append(role)
+
+        return to_return
+
+    async def set_stored_roles(self, value: list[discord.Role] | list[int]):
+        def check(x) -> int:
+            if type(x) is int:
+                return x
+
+            return x.id
+
+        to_store = list(map(lambda x: check(x), value))
+
+        self._roles = to_store
+        await self.save()
+
+    async def add_stored_role(self, value: int | discord.Role):
+        if type(value) is discord.Role:
+            value = value.id
+
+        if value in self._roles:
+            return
+
+        self._roles.append(value)
+        await self.save()
 
     async def apply_xp_booster(self, power: float, duration: datetime.timedelta) -> 'XPBooster':
         from src.models import XPBooster

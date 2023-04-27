@@ -11,7 +11,6 @@ class Reward(Unique):
     def __repr__(self):
         return get_formatted_reward_string(self)
 
-
 class RoleReward(Reward):
     def __init__(
             self, payload: int, hierarchy_previous: int | None = None, inventoriable: bool = False, key: str = None

@@ -1,4 +1,6 @@
 import discord
+
+import config
 from src.achievements import Achievements, Achievement
 from src.base_types import Unique
 from src.bot import T84, T84ApplicationContext
@@ -8,6 +10,11 @@ from src.rewards import leveled_rewards
 achievements = [
     discord.OptionChoice(x.value.key)
     for x in Achievements
+]
+
+changeable_roles = [
+    discord.OptionChoice(str(x))
+    for x in config.CHANGEABLE_ROLES
 ]
 
 async def inventory_items(ctx: discord.AutocompleteContext):
@@ -90,9 +97,20 @@ class AdminCommands(discord.Cog):
 
         await ctx.respond(content="☑ Успішно!", ephemeral=True)
 
-    @add.command(name='achievement', description='🛑 Добавити досягнення.')
+    @add.command(name='stored_role', description='🛑 Додати перемикаєму роль.')
+    async def adm_add_stored_role(
+            self, ctx: T84ApplicationContext, member: discord.Member,
+            role: discord.Option(str, choices=changeable_roles)
+    ):
+        user = await User.get(discord_id=member.id)
+
+        await user.add_stored_role(int(role))
+
+        await ctx.respond("☑ Успішно", ephemeral=True)
+
+    @add.command(name='achievement', description='🛑 Додати досягнення.')
     async def adm_add_achievement(
-            self, ctx: T84ApplicationContext, member: discord.Option(discord.Member),
+            self, ctx: T84ApplicationContext, member: discord.Member,
             achievement: discord.Option(str, choices=achievements), notify_user: bool = False
     ):
         user = await User.get(discord_id=member.id)

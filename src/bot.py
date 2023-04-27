@@ -1,3 +1,5 @@
+import calendar
+import datetime
 import logging
 import os
 import aiohttp
@@ -182,18 +184,26 @@ class T84(discord.Bot, ABC):
         elif isinstance(error, NotEnoughPremiumCurrency):
             return await ctx.respond(
                 f"❌ У вас недостатньо 💎 Преміального балансу.\n"
-                f"> Ваш баланс: `{ctx.user_instance.premium_balance} 💎`",
+                f"> Ваш баланс: `{ctx.user_instance.premium_balance} 💎`\n\n"
+                f"Інформація щодо преміальну валюту <#{self.config.DONATE_INFO_CHANNEL}>",
                 ephemeral=True
             )
-
-        elif isinstance(error, discord.NotFound):
-            return
 
         elif isinstance(error, CommandOnCooldown):
-            return await ctx.respond(
-                content=f'❌ На цю команду діє кулдаун: `{round(error.cooldown.get_retry_after())} секунд`',
-                ephemeral=True
-            )
+
+            retry_at = datetime.datetime.utcnow() + \
+                              datetime.timedelta(seconds=error.cooldown.get_retry_after())
+            try:
+                return await ctx.respond(
+                    content=f'❌ На цю команду діє кулдаун, спробуйте ще раз '
+                            f'<t:{calendar.timegm(retry_at.timetuple())}:R>',
+                    ephemeral=True
+                )
+            except discord.NotFound:
+                await ctx.send(
+                    f"{ctx.user.mention}, На цю команду діє кулдаун, спробуйте ще раз "
+                    f'<t:{calendar.timegm(retry_at.timetuple())}:R>'
+                )
 
         elif isinstance(error, discord.ApplicationCommandInvokeError):
             await ctx.send(

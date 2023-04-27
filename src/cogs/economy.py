@@ -26,7 +26,7 @@ class Gambling(discord.Cog):
         name='pay', description='💳 Перевести гроші іншому користувачу.'
     )
     @cooldown(1, 10, BucketType.user)
-    async def eco_pay(
+    async def pay(
             self, ctx: T84ApplicationContext, member: discord.Option(discord.Member), amount: discord.Option(
                 int, min_value=1, max_value=100_000
             )
@@ -56,46 +56,18 @@ class Gambling(discord.Cog):
             logging.INFO
         )
 
-    # implement Player 2 Player coinflip system, instead of Player 2 Bot
-    #@eco.command(
-    #    name='coinflip',
-    #    description='🃏 Коінфліп ігровою валютою. При виграші ви отримуєте +100% від ставки.'
-    #)
-    #@cooldown(1, 3, BucketType.user)
-    async def eco_coinflip(
-            self, ctx: T84ApplicationContext,
-            amount: discord.Option(int, min_value=100, max_value=100_000),
-            pick: discord.Option(str, choices=choices)
-    ):
-        user = ctx.user_instance
-
-        if amount > user.balance:
-            return await ctx.respond(
-                f"❌ **Вам недостатньо коштів!**\n"
-                f"*Доступний баланс: `{user.balance}`*",
-                ephemeral=True
-            )
-
-        bot_choice = random.choice(choices)
+    @discord.slash_command(name='work', description='💰 Невелика кількість валюти раз в день.')
+    @cooldown(1, 43200, BucketType.user)
+    async def work(self, ctx: T84ApplicationContext):
+        money = random.randint(self.bot.config.WORK_MIN_AMOUNT, self.bot.config.WORK_MAX_AMOUNT)
+        await ctx.user_instance.add_balance(money)
 
         embed = DefaultEmbed()
-
-        if bot_choice != pick:
-            embed.title = 'Ви програли, всі ваші гроші тепер мої! 😎'
-            embed.description = f"**-{amount}** 💸"
-            embed.set_thumbnail(url=images.get(bot_choice))
-
-            await ctx.respond(embed=embed)
-            return
-
-        await user.add_balance(amount)
-
-        embed.title = 'Ви виграли 😢'
-        embed.description = f"**+{amount}** 💸"
-        embed.set_thumbnail(url=images.get(bot_choice))
+        embed.title = "💰 Праця"
+        embed.description = f"Ваша зарплатня за цей день: `{money} 💸`"
+        embed.colour = discord.Colour.green()
 
         await ctx.respond(embed=embed)
-
 
 def setup(bot):
     bot.add_cog(Gambling(bot))

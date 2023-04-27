@@ -17,6 +17,7 @@ pytz==2022.5
 tortoise-orm==0.19.2
 typing_extensions==4.4.0
 yarl==1.8.1
-certifi==2022.9.24
+certifi==2022.12.7
 urllib3==1.26.12
 pycord-multicog==1.0.2
+numpy==1.24.3
