@@ -390,3 +390,26 @@ class User(Model):
             affected = False
 
         return level, affected, rewards_string or None
+
+    async def timeout(self, reason: str, duration: datetime.timedelta, moderator: discord.Member) -> None:
+        """
+        :param reason: timeout reason
+        :param duration: duration of the timeout
+        :param moderator: User who gave out the timeout
+        :return None
+        """
+        discord_instance = await self.get_discord_instance()
+
+        await discord_instance.timeout_for(duration, reason=reason)
+        await T84.send_critical_log(
+            f"Користувачу {discord_instance.mention} `({discord_instance.id})` було видано тайм-аут модератором "
+            f"{moderator} `({moderator.id})` за причиною: `{reason}`", level=logging.INFO
+        )
+
+        embed = DefaultEmbed()
+        embed.title = "⚠️ Вам було видано тайм-аут!"
+        embed.description = f'🚔 Модератор {moderator.mention} видав вам тайм-аут за причиною: ' \
+                            f'```glsl\n# {reason}```\n' \
+                            f'⚖️ Оскаржити покарання можна у каналі <#{config.APPEAL_CHANNEL}>'
+
+        await self.send(embed=embed)

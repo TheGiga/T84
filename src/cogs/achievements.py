@@ -24,7 +24,7 @@ class Achievements(discord.Cog):
 
         await ctx.defer()
 
-        user = await User.get(discord_id=discord_instance.id)
+        user, _ = await User.get_or_create(discord_id=discord_instance.id)
 
         embed = DefaultEmbed()
         embed.title = f"Досягнення користувача {discord_instance.display_name}"

@@ -58,11 +58,6 @@ class T84(discord.Bot, ABC):
             self.config.PARENT_GUILD = self.config.BACKEND_GUILD
             self.config.PARENT_GUILD_MAIN_CHAT = self.config.BACKEND_CHAT
             self.config.EVENT_CHANNEL_ID = self.config.BACKEND_CHAT
-            self.config.SELF_ROLES_IDS = [
-                1049431166442279074, 1084615910242914426, 1084615904014368868,
-                1084615903066476595, 1084615902185660476, 1084615896162635813
-            ]
-            self.config.SELF_ROLES_CHANNEL_ID = self.config.BACKEND_CHAT
 
     @property
     async def parent_guild(self) -> discord.Guild | None:

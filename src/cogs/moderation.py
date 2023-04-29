@@ -1,86 +1,58 @@
-import logging
+import calendar
+import datetime
 
 import discord
 from discord.ext.commands import has_permissions, cooldown, BucketType
 
 from src import DefaultEmbed
 from src.bot import T84, T84ApplicationContext
+from src.models import User
 from src.reasons import Reasons
 
-reasons = [
-    discord.OptionChoice(x.value.name, str(x.value.id))
-    for x in Reasons
-]
+async def reasons(ctx: discord.AutocompleteContext):
+    return [x.value.name for x in Reasons if x.value.name.startswith(ctx.value)]
 
 
 class Moderation(discord.Cog):
     def __init__(self, bot):
         self.bot: T84 = bot
 
-    moderation = discord.SlashCommandGroup(name='moderation', description='👮 Команди модератора.')
-
     @has_permissions(moderate_members=True)
-    @cooldown(3, 60, BucketType.user)
-    @moderation.command(name='action', description='👮 Команда модератора: ПОКАРАННЯ')
-    async def mute(self, ctx: T84ApplicationContext, member: discord.Option(discord.Member),
-                   reason: discord.Option(
-                       choices=reasons, description='Причина покарання.'
-                   )):
-        # "Reason id is 7, but indexing starts at 0, so I decrease it by 1"
-        enum_reason = Reasons.get_from_id(int(reason))
-
-        await ctx.defer(ephemeral=True)
-
+    @cooldown(5, 60, BucketType.user)
+    @discord.slash_command(name='mute', description='👮 Команда модератора: МУТ')
+    async def mute(
+            self, ctx: T84ApplicationContext, member: discord.Option(discord.Member),
+            reason: discord.Option(autocomplete=reasons, description='Причина покарання'),
+            duration: discord.Option(int, description="Час в хвилинах")
+    ):
         if ctx.user.top_role.position < member.top_role.position:
             return await ctx.respond(
                 content="❌ Неможливо задати покарання для користувача з рол'ю вище вашої.", ephemeral=True
             )
 
-        embed = DefaultEmbed()
-        embed.description = f'**Причина:** `{enum_reason.name}`'
-        embed.add_field(name='👮 Модератор', value=ctx.author.mention)
-        embed.add_field(name='⏰ Термін', value=str(enum_reason.duration))
+        await ctx.defer(ephemeral=True)
+        member_instance, _ = await User.get_or_create(discord_id=member.id)
+        duration = datetime.timedelta(minutes=duration)
+        duration_timestamp = calendar.timegm((datetime.datetime.utcnow() + duration).timetuple())
 
-        match enum_reason.action:
-            case 'timeout':
-                embed.title = f'Вам було видано мут на сервері ДТВУ.'
-                embed.colour = discord.Colour.orange()
-
-                try:
-                    await member.send(embed=embed)
-                except discord.Forbidden:
-                    pass
-
-                await member.timeout_for(duration=enum_reason.duration, reason=enum_reason.name)
-
-            case 'ban':
-                embed.title = f'Вам було видано БАН на сервері ДТВУ!'
-                # TODO: Сделать ебучий разбан по времени потом))
-                #embed.add_field(2, name='⏰ Термін', value='__НАЗАВЖДИ__')  # value=str(enum_reason.duration))#
-                embed.colour = discord.Colour.red()
-
-                try:
-                    await member.send(embed=embed)
-                except discord.Forbidden:
-                    pass
-
-                await member.ban(reason=enum_reason.name)
-
-        await self.bot.send_critical_log(
-            message=f'Користувач {member.mention} `({member.id})` '
-                    f'був покараний модератором {ctx.author.mention} `({ctx.author.id})` '
-                    f'за причиною: `{enum_reason.name}`', level=logging.INFO
-        )
-
+        await member_instance.timeout(reason, duration, moderator=ctx.user)
         await ctx.respond(
-            content=f'☑️ Користувач {member.mention} успішно покараний за причиною: `{enum_reason.name}`',
-            ephemeral=True
+            f"☑️ Ви успішно видали тайм-аут користувачу {member.mention}\n"
+            f"⏰ Строком до <t:{duration_timestamp}:f>\n"
+            f"🔨 За причиною `{reason}`"
         )
 
-        await ctx.send(
-            f'⚠️ **Користувача {member.mention} було покарано модератором {ctx.author.mention}.**\n'
-            f'> Причина: `{enum_reason.name}` ||Термін: `{enum_reason.duration}`||'
-        )
+        embed = DefaultEmbed()
+        embed.title = f"⚠️ Користувача {member.display_name} було покарано!"
+        embed.description = f'Користувачу {member.mention} було видано тайм-аут модератором {ctx.user.mention}\n\n' \
+                            f'**Причина: `{reason}`**'
+
+        await ctx.send(embed=embed)
+
+
+
+
+
 
 
 def setup(bot):
