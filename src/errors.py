@@ -4,6 +4,9 @@ import discord
 class GuildNotWhitelisted(discord.ApplicationCommandError):
     pass
 
+class NotEnoughCurrency(discord.ApplicationCommandError):
+    pass
+
 class NotEnoughPremiumCurrency(discord.ApplicationCommandError):
     pass
 

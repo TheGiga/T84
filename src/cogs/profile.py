@@ -40,7 +40,7 @@ class Profile(discord.Cog):
     async def inventory(
             self, ctx: T84ApplicationContext, member: discord.Option(discord.Member, description="👤 Користувач") = None
     ):
-        member = member or ctx.author
+        member = member or ctx.user
 
         user_instance, _ = await User.get_or_create(discord_id=member.id)
 
@@ -49,9 +49,14 @@ class Profile(discord.Cog):
 
         desc = ""
         for item in user_instance.inventory:
-            desc += f"**{item}**\n\n"
+            desc += f"**{item}**\n"
 
-        embed.description = desc if desc else "*Пусто* 😢"
+        desc += \
+            "\n💡 *Якщо ви шукаєте де можна перемкнути відображення ролей - пропишіть команду `/roles`*" \
+                if member.id == ctx.user.id and desc else ""
+
+        embed.description = \
+            desc if desc else "*Пусто* 😢"
 
         await ctx.respond(embed=embed)
 

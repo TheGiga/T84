@@ -14,6 +14,7 @@ ADMINS: list[int] = [352062534469156864, 690237585372610560]
 
 cogs: list = [
     "help",
+    "shop",
     "admin",
     "profile",
     "economy",

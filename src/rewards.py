@@ -1,3 +1,4 @@
+import config
 from src.achievements import Achievement
 from src.base_types import Unique
 from src.models import User
@@ -10,6 +11,9 @@ class Reward(Unique):
 
     def __repr__(self):
         return get_formatted_reward_string(self)
+
+    async def apply(self, **kwargs):
+        pass
 
 class RoleReward(Reward):
     def __init__(
@@ -26,6 +30,9 @@ class RoleReward(Reward):
 
         if role is not None:
             await discord_instance.add_roles(role, reason=f"Нагорода")
+
+            if role.id in config.CHANGEABLE_ROLES:
+                await user.add_stored_role(role)
 
         if self.inventoriable:
             await user.add_inventory_item(self)
