@@ -119,7 +119,7 @@ class BattlePassLevels:
         35: BPIL(
             BPI("🔸 Валюта | 1000 💸", BalanceReward(1000)),
             BPI("🔻 Роль | ФОП Дніпро", RoleReward(1109958849542246551)),
-            paid=False
+            paid=True
         ),
 
         36: F, 37: FP, 38: FP, 39: F,

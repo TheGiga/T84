@@ -36,6 +36,9 @@ class BattlePassCog(discord.Cog):
         embed.title = f"Нагороди {level}-ого рівню | Battle Pass"
         embed.description = str(rewards if rewards else "*Немає :(*")
 
+        if rewards.paid:
+            embed.colour = discord.Colour.blurple()
+
         await ctx.respond(embed=embed)
 
     @battlepass_commands.command(
