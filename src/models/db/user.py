@@ -293,7 +293,7 @@ class User(Model):
         return embed
 
     async def get_battlepass_embed(self, season: int = config.CURRENT_BP_SEASON) -> discord.Embed:
-        from src import BattlePassEnum
+        from src import BattlePassLevels
 
         bp = await self.get_battlepass_data(season=season)
         embed = DefaultEmbed()
@@ -301,9 +301,11 @@ class User(Model):
         if bp.premium:
             embed.colour = discord.Colour.blurple()
 
-        next_rewards = BattlePassEnum.get_by_level(bp.level+1)
+        next_rewards = BattlePassLevels.get_by_level(bp.level + 1)
 
-        if next_rewards.paid and not bp.premium:
+        if not next_rewards:
+            next_rewards = None
+        elif next_rewards.paid and not bp.premium:
             next_rewards = None
 
         percent = (bp.xp / ((bp.level + 1) * config.BP_XP_PER_LEVEL)) * 100

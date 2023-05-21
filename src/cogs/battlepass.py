@@ -3,14 +3,15 @@ from discord import SlashCommandGroup, ButtonStyle
 
 import config
 from src import T84ApplicationContext, DefaultEmbed, NotEnoughPremiumCurrency, CouldNotSendDM, boolean_emoji, \
-    BattlePassEnum
+    BattlePassLevels
+from src.bot import T84
 from src.models import User
 from discord.ext.tasks import loop
 
 
 class BattlePassCog(discord.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: T84 = bot
         self.cache = []
         self.caching_loop.start()
 
@@ -25,6 +26,47 @@ class BattlePassCog(discord.Cog):
         embed = await ctx.user_instance.get_battlepass_embed()
 
         await ctx.respond(embed=embed)
+
+    # make it much user friendlier plspls me
+    @battlepass_commands.command(name='rewards', description='🔰 Список нагород баттл-пассу поточного сезону.')
+    async def battlepass_rewards(self, ctx: T84ApplicationContext, level: int):
+        rewards = BattlePassLevels.get_by_level(level)
+
+        embed = DefaultEmbed()
+        embed.title = f"Нагороди {level}-ого рівню | Battle Pass"
+        embed.description = str(rewards if rewards else "*Немає :(*")
+
+        await ctx.respond(embed=embed)
+
+    @battlepass_commands.command(
+        name='booster', description='🔰 Якщо ви бустер серверу - ви можете отримати баттл-пасс безкоштовно!'
+    )
+    async def battlepass_booster(self, ctx: T84ApplicationContext):
+        booster_role = ctx.guild.get_role(self.bot.config.BOOSTER_ROLE)
+
+        if not booster_role in ctx.user.roles:
+            return await ctx.respond(
+                "** ❌ Ви не є бустером серверу!**\n"
+                f"- Щоб отримати преміум баттл-пасс вам треба стати бустером серверу!\n\n"
+                f"*Або придбати його за {config.BP_PREMIUM_COST} 💎, більше інформації -> "
+                f"<#{config.DONATE_INFO_CHANNEL}>*",
+                ephemeral=True
+            )
+
+        bp = await ctx.user_instance.get_battlepass_data()
+
+        if bp.premium:
+            return await ctx.respond(
+                f"✅ Ви вже маєте **Преміум баттл-пасс `#{config.CURRENT_BP_SEASON}`**.", ephemeral=True
+            )
+
+        bp.premium = True
+        await bp.save()
+
+        await ctx.respond(
+            f"✅ Ви успішно отримали **Преміум баттл-пасс `#{config.CURRENT_BP_SEASON}`**!"
+        )
+        await BattlePassLevels.PAID_INSTANT.apply_all(user=ctx.user_instance)
 
     @battlepass_commands.command(
         name='buy', description=f"🔰 Купити преміум баттл-пасс цього сезону. [Ціна: {config.BP_PREMIUM_COST} 💎]"
@@ -54,7 +96,7 @@ class BattlePassCog(discord.Cog):
             await bp.save()
 
             await interaction.response.send_message(content='✅ Успішно!')
-            await BattlePassEnum.PAID_INSTANT.value.apply_all(user=ctx.user_instance)
+            await BattlePassLevels.PAID_INSTANT.apply_all(user=ctx.user_instance)
 
 
         view = discord.ui.View(timeout=30.0, disable_on_timeout=True)

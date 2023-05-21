@@ -11,5 +11,5 @@ class DefaultEmbed(discord.Embed):
 
 from .bot import bot_instance, T84ApplicationContext
 from .errors import *
-from .battlepass import BattlePassEnum
+from .battlepass import BattlePassLevels
 from .utils import *

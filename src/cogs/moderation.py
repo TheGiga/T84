@@ -25,8 +25,14 @@ class Moderation(discord.Cog):
             reason: discord.Option(autocomplete=reasons, description='Причина покарання'),
             duration: discord.Option(int, description="Час в хвилинах")
     ):
-        if ctx.user.top_role.position < member.top_role.position:
+        if type(member) is discord.User:
             return await ctx.respond(
+                "Користувач покинув сервер. Як варіант можна його забанити через іншого бота :)",
+                ephemeral=True
+            )
+
+        if ctx.user.top_role.position < member.top_role.position:
+             return await ctx.respond(
                 content="❌ Неможливо задати покарання для користувача з рол'ю вище вашої.", ephemeral=True
             )
 

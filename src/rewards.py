@@ -59,6 +59,13 @@ class BalanceReward(Reward):
     async def apply(self, user: User):
         await user.add_balance(amount=self.payload)
 
+class PremiumBalanceReward(Reward):
+    def __init__(self, payload: int, key: str = None):
+        super().__init__(payload, key)
+
+    async def apply(self, user: User):
+        await user.add_premium_balance(amount=self.payload)
+
 
 def get_formatted_reward_string(value) -> str:
     if value.__class__ == RoleReward:

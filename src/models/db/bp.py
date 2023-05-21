@@ -30,12 +30,12 @@ class BattlePassModel(Model):
         new_level = self.xp // config.BP_XP_PER_LEVEL
 
         if new_level != self.level:
-            from src.battlepass import BattlePassEnum
+            from src.battlepass import BattlePassLevels
 
             self.level = new_level
             await self.save()
 
-            item_list = BattlePassEnum.get_by_level(self.level)
+            item_list = BattlePassLevels.get_by_level(self.level)
             user = await self.get_user()
 
             if item_list.paid and not self.premium:
