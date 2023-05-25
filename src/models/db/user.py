@@ -303,10 +303,12 @@ class User(Model):
 
         next_rewards = BattlePassLevels.get_by_level(bp.level + 1)
 
+        from src.battlepass import BattlePassItemList
+
         if not next_rewards:
-            next_rewards = None
+            next_rewards = BattlePassItemList(paid=False) # empty list
         elif next_rewards.paid and not bp.premium:
-            next_rewards = None
+            next_rewards = BattlePassItemList(paid=False) # empty list
 
         percent = (bp.xp / ((bp.level + 1) * config.BP_XP_PER_LEVEL)) * 100
         progress = progress_bar(percent)
@@ -318,7 +320,7 @@ class User(Model):
                                                                                           * config.BP_XP_PER_LEVEL}`
         
         {'⭐' if next_rewards.paid else '🔹'} **Нагороди наступного рівню:**
-        {next_rewards if next_rewards else '*Нагороди наступного рівню тільки преміальні*'}
+        {next_rewards if len(next_rewards) > 0 else '*Нагороди наступного рівню тільки преміальні*'}
         """
 
         embed.add_field(name="🔘 Досвід BP", value=f'`{bp.xp}`')

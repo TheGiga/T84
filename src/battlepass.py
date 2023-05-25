@@ -42,6 +42,9 @@ class BattlePassItemList(Iterable, ABC):
 
         return to_return.removesuffix("\n")
 
+    def __len__(self):
+        return len(self._items)
+
     async def apply_all(self, user: 'User'):
         for _item in self._items:
             await _item.reward.apply(user=user)
