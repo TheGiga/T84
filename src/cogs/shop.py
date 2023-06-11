@@ -20,7 +20,7 @@ class BuyButton(discord.ui.Button):
             await self.item.apply(user=self.user)
 
             await interaction.response.send_message(f"☑️ Ви успішно придбали {self.item.reward}", ephemeral=True)
-        except NotEnoughCurrency or NotEnoughPremiumCurrency:
+        except (NotEnoughCurrency,NotEnoughPremiumCurrency):
             return await interaction.response.send_message("❌ У вас недостатньо коштів!", ephemeral=True)
 
 
