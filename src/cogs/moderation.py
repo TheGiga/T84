@@ -32,7 +32,7 @@ class Moderation(discord.Cog):
         if role not in message.author.roles:
             return
 
-        if re.match(self.bot.config.CUSTOM_EMOJI_REGEX, message.content):
+        if re.search(self.bot.config.CUSTOM_EMOJI_REGEX, message.content):
             await message.delete()
 
 
