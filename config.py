@@ -27,7 +27,10 @@ cogs: list = [
 ]
 
 # Filter
-BLACKLIST: list = ["🇿", "🇻", "🇷🇺"]
+BLACKLIST: list = ["🇿", "🇻", "🇷🇺"]\
+
+EMOJI_BLOCK_ROLE: int = 1132366830476992552
+CUSTOM_EMOJI_REGEX: str = r'(<a?):\w+:(\d{18,20}>)'
 
 # Events
 EVENT_CHANNEL_ID: int = PARENT_GUILD_MAIN_CHAT

@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import re
 
 import discord
 from discord.ext.commands import has_permissions, cooldown, BucketType
@@ -16,6 +17,17 @@ async def reasons(ctx: discord.AutocompleteContext):
 class Moderation(discord.Cog):
     def __init__(self, bot):
         self.bot: T84 = bot
+
+    @discord.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        role = message.guild.get_role(self.bot.config.EMOJI_BLOCK_ROLE)
+
+        if not role or message.author.bot:
+            return
+
+        if re.match(self.bot.config.CUSTOM_EMOJI_REGEX, message.content):
+            await message.delete()
+
 
     @has_permissions(moderate_members=True)
     @cooldown(5, 60, BucketType.user)
