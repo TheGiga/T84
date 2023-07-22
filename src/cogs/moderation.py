@@ -20,9 +20,16 @@ class Moderation(discord.Cog):
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
-        role = message.guild.get_role(self.bot.config.EMOJI_BLOCK_ROLE)
+        if message.author.bot:
+            return
 
-        if not role or message.author.bot:
+        guild = await self.bot.parent_guild
+        role = guild.get_role(self.bot.config.EMOJI_BLOCK_ROLE)
+
+        if not role:
+            role = await guild._fetch_role(self.bot.config.EMOJI_BLOCK_ROLE)
+
+        if role not in message.author.roles:
             return
 
         if re.match(self.bot.config.CUSTOM_EMOJI_REGEX, message.content):
