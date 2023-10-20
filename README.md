@@ -11,7 +11,6 @@
 - Shop System
 - User profiles
 - Chat events
-- Gambling
 - ~~Useful administrative commands~~
 
 ![Discord_bkzYPLeK6S](https://user-images.githubusercontent.com/49173264/203198328-5a5f2411-e10c-4526-8a9c-2be8a743fa4f.png)
